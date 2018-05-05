@@ -27,6 +27,7 @@ var handler = module.exports;
  * @param {Function} next
  * @api public
  */
+//服务器的enterScene
 handler.enterScene = function(msg, session, next) {
   var area = session.area;
   var playerId = session.get('playerId');
@@ -39,7 +40,7 @@ handler.enterScene = function(msg, session, next) {
 	utils.myPrint("1 ~ EnterScene: playerId = ", playerId);
 	utils.myPrint("1 ~ EnterScene: teamId = ", teamId);
 
-  userDao.getPlayerAllInfo(playerId, function(err, player) {
+  userDao.getPlayerAllInfo(playerId, function(err, player) { //读取用户所有信息
     if (err || !player) {
       logger.error('Get user for userDao failed! ' + err.stack);
       next(new Error('fail to get user from dao'), {
@@ -60,13 +61,13 @@ handler.enterScene = function(msg, session, next) {
 
     pomelo.app.rpc.chat.chatRemote.add(session, session.uid,
 			player.name, channelUtil.getAreaChannelName(areaId), null);
-		var map = area.map;
+		var map = area.map; //加入到该地图的频道
 
     // temporary code
     //Reset the player's position if current pos is unreachable
 		if(!map.isReachable(player.x, player.y)) {
     // {
-			var pos = map.getBornPoint();
+			var pos = map.getBornPoint(); //玩家出生的位置
 			player.x = pos.x;
 			player.y = pos.y;
 		}
@@ -85,11 +86,11 @@ handler.enterScene = function(msg, session, next) {
         }
     };
 		// utils.myPrint("1.5 ~ GetPlayerAllInfo data = ", JSON.stringify(data));
-		next(null, data);
+		next(null, data); //发送data到客户端
 
 		utils.myPrint("2 ~ GetPlayerAllInfo player.teamId = ", player.teamId);
 		utils.myPrint("2 ~ GetPlayerAllInfo player.isCaptain = ", player.isCaptain);
-		if (!area.addEntity(player)) {
+		if (!area.addEntity(player)) { //将玩家的最新信息添加到area
       logger.error("Add player to area faild! areaId : " + player.areaId);
       next(new Error('fail to add user into area'), {
        route: msg.route,
@@ -102,7 +103,7 @@ handler.enterScene = function(msg, session, next) {
 			// send player's new info to the manager server(team manager)
 			var memberInfo = player.toJSON4TeamMember();
 			memberInfo.backendServerId = pomelo.app.getServerId();
-			pomelo.app.rpc.manager.teamRemote.updateMemberInfo(session, memberInfo,
+			pomelo.app.rpc.manager.teamRemote.updateMemberInfo(session, memberInfo, //更新队伍信息
 				function(err, ret) {
 				});
 		}

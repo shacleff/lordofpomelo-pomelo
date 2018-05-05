@@ -23,6 +23,7 @@ __resources__["/app.js"] = {meta: {mimetype: "application/javascript"}, data: fu
 	 * Init client ara
 	 * @param data {Object} The data for init area
 	 */
+	//客户端收到服务器信息后，执行app.init
 	function init(data) {
 		var map = data.map;
 		pomelo.player = data.curPlayer;

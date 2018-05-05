@@ -69,24 +69,25 @@ var _getAnimationJson = function() {
  * @param {Function} next
  * @api public
  */
+//读取
 handler.loadResource = function(msg, session, next) {
   var data = {};
   if (msg.version.fightskill !== version.fightskill) {
-    data.fightskill = dataApi.fightskill.all();
+    data.fightskill = dataApi.fightskill.all(); //技能
   }
   if (msg.version.equipment !== version.equipment) {
-    data.equipment = dataApi.equipment.all();
+    data.equipment = dataApi.equipment.all();   //装备
   }
   if (msg.version.item !== version.item) {
-    data.item = dataApi.item.all();
+    data.item = dataApi.item.all(); //物品
   }
   if (msg.version.character !== version.character) {
-    data.character = dataApi.character.all();
+    data.character = dataApi.character.all(); //人物
   }
   if (msg.version.npc !== version.npc) {
-    data.npc = dataApi.npc.all();
+    data.npc = dataApi.npc.all(); //npc
   }
-  if (msg.version.animation !== version.animation) {
+  if (msg.version.animation !== version.animation) { //动物
     data.animation = _getAnimationJson();
   }
   if (msg.version.effect !== version.effect) {

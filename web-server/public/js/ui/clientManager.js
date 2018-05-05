@@ -81,6 +81,8 @@ __resources__["/clientManager.js"] = {
         return;
       }
 
+        //"http://127.0.0.1:3001/login"
+        //客户端输入账号密码，发送到register服务器
       $.post(httpHost + 'login', {username: username, password: pwd}, function(data) {
         if (data.code === 501) {
           alert('Username or password is invalid!');
@@ -93,6 +95,7 @@ __resources__["/clientManager.js"] = {
           return;
         }
 
+        //发送token到gate服务器
         authEntry(data.uid, data.token, function() {
           loading = false;
         });
@@ -101,7 +104,11 @@ __resources__["/clientManager.js"] = {
     }
 
     function queryEntry(uid, callback) {
+
+      //客户端连接到pomelo的gate服务器上
       pomelo.init({host: config.GATE_HOST, port: config.GATE_PORT, log: true}, function() {
+
+        //根据获得的host和ip发送token到指定的connector服务器
         pomelo.request('gate.gateHandler.queryEntry', { uid: uid}, function(data) {
           pomelo.disconnect();
 
@@ -152,7 +159,10 @@ __resources__["/clientManager.js"] = {
           }
 
           // init handler
+            // 客户端收到玩家信息后，进行消息监听loginMsgHandler监听登陆和玩家在线情况
           loginMsgHandler.init();
+
+          //gameMsgHandler游戏逻辑信息监听，如移动行为等
           gameMsgHandler.init();
 
           if (!player || player.id <= 0) {
@@ -165,6 +175,8 @@ __resources__["/clientManager.js"] = {
     }
 
     function authEntry(uid, token, callback) {
+
+      //gate服务器
       queryEntry(uid, function(host, port) {
         entry(host, port, token, callback);
       });
@@ -245,12 +257,13 @@ __resources__["/clientManager.js"] = {
       }
     }
 
+    //登陆后，加载地图信息，加载地图怪物，人物信息
     function afterLogin(data) {
       var userData = data.user;
       var playerData = data.player;
 
       var areaId = playerData.areaId;
-      var areas = {1: {map: {id: 'jiangnanyewai.png', width: 3200, height: 2400}, id: 1}};
+      var areas = {1: {map: {id: 'jiangnanyewai.png', width: 3200, height: 2400}, id: 1}}; //读取trim地图信息
 
       if (!!userData) {
         pomelo.uid = userData.id;
@@ -289,10 +302,10 @@ __resources__["/clientManager.js"] = {
       var $bar = $('#id_loadRate').css('width', 0);
       loader.on('loading', function(data) {
         var n = parseInt(data.loaded * 100 / data.total, 10);
-        $bar.css('width', n + '%');
+        $bar.css('width', n + '%'); //加载地图进度
         $percent.html(n);
       });
-      loader.on('complete', function() {
+      loader.on('complete', function() {  //完成
         if (callback) {
           setTimeout(function(){
             callback();
@@ -303,6 +316,7 @@ __resources__["/clientManager.js"] = {
       loader.loadAreaResource();
     }
 
+    //加载完地图数据进入场景
     function enterScene(){
       pomelo.request("area.playerHandler.enterScene", null, function(data){
         app.init(data);
