@@ -33,6 +33,8 @@ var Brain = function(blackboard) {
 
 var pro = Brain.prototype;
 
+//遍历this.mobs的怪物对象，执行对象的update方法，执行doAction
+//doAction遍历行为树，根据行为树的设定，执行响应的action
 pro.update = function() {
 	return this.action.doAction();
 };
@@ -64,6 +66,9 @@ var genAttackAction = function(blackboard) {
 		return !!bb.curTarget;
 	};
 
+	//持续攻击行为
+    //行为树的Loop循环节点，循环判断checkTarget检查对象是否存在，如果存在，则一直攻击
+    //如果有目标，则开始执行持续攻击
 	var loopAttack = new Loop({
 		blackboard: blackboard, 
 		child: attack, 

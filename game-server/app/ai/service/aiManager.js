@@ -26,6 +26,8 @@ pro.stop = function() {
  * Add a brain to the character if the type is mob.
  * Start the tick if it has not started yet.
  */
+//为角色添加ai行为和准则
+//读取game-server/app/ai/brain目录下的所有行为模式。在lord目录下，有player.js和tiger.js，将动作行为，添加到this.mobs[]下，
 pro.addCharacters = function(cs) {
 	if(!this.started || this.closed) {
 		return;
