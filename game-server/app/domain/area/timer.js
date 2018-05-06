@@ -107,6 +107,9 @@ Timer.prototype.patrol = function(entityId) {
  * @param newPos {Object} New position.
  * @return {Boolean} If the update success.
  */
+//当一个人移动的时候，我们就调用更新个人位置，通知其他观察者
+//Watcher相当于人物的视野
+//Object相当于塔的对象
 Timer.prototype.updateObject = function(obj, oldPos, newPos) {
   return this.area.aoi.updateObject(obj, oldPos, newPos);
 };

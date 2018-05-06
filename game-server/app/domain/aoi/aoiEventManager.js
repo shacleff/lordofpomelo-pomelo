@@ -6,6 +6,7 @@ var utils = require('../../util/utils');
 var exp = module.exports;
 
 //Add event for aoi
+//根据aoi不同的事件回调，向客户端发出不同的回调事件，如添加实物，附近玩家等信息
 exp.addEvent = function(area, aoi){
 	aoi.on('add', function(params){
 		params.area = area;

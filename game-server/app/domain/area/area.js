@@ -152,6 +152,7 @@ Instance.prototype.addEntity = function(e) {
     this.getChannel().add(e.userId, e.serverId);
     this.aiManager.addCharacters([e]);
 
+    //当一个人第一次登如到地图的时候，我们就调用aoi.addObject(obj, pos)添加对象到aoi上，通知附近观察者
     this.aoi.addWatcher({id: e.entityId, type: e.type}, {x : e.x, y: e.y}, e.range);
     players[e.id] = e.entityId;
     users[e.userId] = e.id;
