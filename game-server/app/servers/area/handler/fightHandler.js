@@ -25,8 +25,8 @@ handler.attack = function(msg, session, next) {
 		return;
 	}
 
-	session.area.timer.abortAction('move', player.entityId);
-	player.target = target.entityId;
+	session.area.timer.abortAction('move', player.entityId);  //停止移动
+	player.target = target.entityId;  //锁定攻击目标
 
 	// next();
   next(null, {});

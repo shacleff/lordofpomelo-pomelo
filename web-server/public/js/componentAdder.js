@@ -90,6 +90,7 @@ __resources__["/componentAdder.js"] = {meta: {mimetype: "application/javascript"
 	/**
 	 * Mouse click handlerFunction
 	 */
+	//客户端绑定鼠标点击事件到launchAi
 	var launchAi = function (event, node) {
 		var id = node.id;
 		if (event.type === 'mouseClicked') {

@@ -9,17 +9,17 @@ __resources__["/playerHandler.js"] = {meta: {mimetype: "application/javascript"}
   function exec(type, params) {
     switch (type) {
       case btns.ATTACK_PLAYER: {
-        attackPlayer(params);
+        attackPlayer(params); //攻击玩家
       }
         break;
 
       case btns.APPLY_JOIN_TEAM: {
-        applyJoinTeam(params);
+        applyJoinTeam(params); //加入队伍
       }
         break;
 
       case btns.INVITE_JOIN_TEAM: {
-        inviteJoinTeam(params);
+        inviteJoinTeam(params); //邀请加入队伍
       }
         break;
     }
@@ -29,7 +29,7 @@ __resources__["/playerHandler.js"] = {meta: {mimetype: "application/javascript"}
    * Attack player action.
    */
   function attackPlayer(params) {
-    pomelo.request('area.fightHandler.attack', {targetId: params.targetId}, function() {});
+    pomelo.request('area.fightHandler.attack', {targetId: params.targetId}, function() {}); //攻击玩家
   }
 
   /**
@@ -41,7 +41,7 @@ __resources__["/playerHandler.js"] = {meta: {mimetype: "application/javascript"}
     console.log('ApplyJoinTeam ~ targetIsCaptain = ', params.targetIsCaptain);
     if (params.targetTeamId > TeamC.TEAM_ID_NONE && params.targetIsCaptain) {
       pomelo.notify("area.teamHandler.applyJoinTeam",
-        {captainId: params.targetPlayerId, teamId: params.targetTeamId});
+        {captainId: params.targetPlayerId, teamId: params.targetTeamId}); //加入队伍
     }
   }
 
@@ -54,7 +54,7 @@ __resources__["/playerHandler.js"] = {meta: {mimetype: "application/javascript"}
     console.log('InviteJoinTeam ~ myIsCaptain = ', params.myIsCaptain);
     if (params.myTeamId > TeamC.TEAM_ID_NONE && params.myIsCaptain) {
       pomelo.notify("area.teamHandler.inviteJoinTeam",
-        {inviteeId: params.targetPlayerId, teamId: params.myTeamId});
+        {inviteeId: params.targetPlayerId, teamId: params.myTeamId}); //邀请队伍
     }
   }
 

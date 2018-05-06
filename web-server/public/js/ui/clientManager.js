@@ -348,6 +348,7 @@ __resources__["/clientManager.js"] = {
       sprite.movePath(paths.path);
     }
 
+    //检查鼠标点击实物的事件，属于哪种类型
     function launchAi(args) {
       var areaId = pomelo.areaId;
       var playerId = pomelo.playerId;
@@ -358,21 +359,21 @@ __resources__["/clientManager.js"] = {
       var skillId = pomelo.player.curSkill;
       var area = app.getCurArea();
       var entity = area.getEntity(targetId);
-      if (entity.type === EntityType.PLAYER || entity.type === EntityType.MOB) {
+      if (entity.type === EntityType.PLAYER || entity.type === EntityType.MOB) { //被攻击的对象类型判断
         if (entity.died) {
           return;
         }
-        if (entity.type === EntityType.PLAYER) {
+        if (entity.type === EntityType.PLAYER) { //如果是玩家，弹出选项，组队或者交易等
           var curPlayer = app.getCurPlayer();
           pomelo.emit('onPlayerDialog', {targetId: targetId, targetPlayerId: entity.id,
             targetTeamId: entity.teamId, targetIsCaptain: entity.isCaptain,
             myTeamId: curPlayer.teamId, myIsCaptain: curPlayer.isCaptain});
         } else if (entity.type === EntityType.MOB) {
-          pomelo.request('area.fightHandler.attack',{targetId: targetId}, function() {});
+          pomelo.request('area.fightHandler.attack',{targetId: targetId}, function() {}); //怪物
         }
       } else if (entity.type === EntityType.NPC) {
-        pomelo.notify('area.playerHandler.npcTalk',{areaId :areaId, playerId: playerId, targetId: targetId});
-      } else if (entity.type === EntityType.ITEM || entity.type === EntityType.EQUIPMENT) {
+        pomelo.notify('area.playerHandler.npcTalk',{areaId :areaId, playerId: playerId, targetId: targetId}); //通知服务器处理攻击事件，不要求回调; npc
+      } else if (entity.type === EntityType.ITEM || entity.type === EntityType.EQUIPMENT) { //检查一下就捡东西相关
         var curPlayer = app.getCurPlayer();
         var bag = curPlayer.bag;
         if (bag.isFull()) {
@@ -380,7 +381,7 @@ __resources__["/clientManager.js"] = {
           return;
         }
         pomelo.request('area.playerHandler.pickItem',
-          {areaId :areaId, playerId: playerId, targetId: targetId}, function() {});
+          {areaId :areaId, playerId: playerId, targetId: targetId}, function() {}); //捡东西
       }
     }
 
