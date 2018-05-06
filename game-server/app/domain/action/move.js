@@ -28,6 +28,8 @@ util.inherits(Move, Action);
 /**
  * Update the move action, it will calculate and set the entity's new position, and update AOI module
  */
+//当执行area.actionManager.update()时，将执行动作队列里的Move.update的方法
+//总体来说，为了避免太多的动作行为，导致服务器多次相应，所以采用一个队列，隔一段事件，处理一次
 Move.prototype.update = function(){
 	this.tickNumber++;
 	var time = Date.now()-this.time;

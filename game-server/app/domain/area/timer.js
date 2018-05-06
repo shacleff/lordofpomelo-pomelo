@@ -37,7 +37,9 @@ Timer.prototype.tick = function() {
   }
 
   //run all the action
-  area.actionManager.update();  //动作更新. 将日常攻击，移动的动作寄存在一个一个队列里面，定时将队列里面的动作执行和清空
+    //动作更新. 将日常攻击，移动的动作寄存在一个一个队列里面，定时将队列里面的动作执行和清空.
+    //读取action数组，执行action行为
+  area.actionManager.update();
 
   area.aiManager.update();      //ai 更新，检查ai反应动作. ai根据行为树，做出反应，让怪物可以主动攻击玩家
 

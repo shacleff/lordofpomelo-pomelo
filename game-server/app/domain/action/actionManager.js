@@ -4,6 +4,7 @@ var logger = require('pomelo-logger').getLogger(__filename);
 /**
  * Action Manager, which is used to contrll all action
  */
+//初始化动作队列
 var ActionManager = function(opts){
 	opts = opts||{};
 	
@@ -20,6 +21,7 @@ var ActionManager = function(opts){
  * Add action 
  * @param {Object} action  The action to add, the order will be preserved
  */
+//添加动作到队列
 ActionManager.prototype.addAction = function(action){
 	if(action.singleton) {
 		this.abortAction(action.type, action.id);
@@ -61,6 +63,7 @@ ActionManager.prototype.abortAllAction = function(id){
  * Update all action
  * @api public
  */
+//遍历动作数组里的所有执行动作，并执行该动作的update方法
 ActionManager.prototype.update = function(){
 	var length = this.actionQueue.length;
 	

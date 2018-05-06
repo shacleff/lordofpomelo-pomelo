@@ -174,6 +174,7 @@ handler.move = function(msg, session, next) {
     return;
   }
 
+  //当客户端发送一个玩家移动行为的时候，服务器将创建一个Move对象
   var action = new Move({
     entity: player,
     path: path,
