@@ -119,6 +119,7 @@ Instance.prototype.initMobZones = function(mobZones) {
  * Add entity to area
  * @param {Object} e Entity to add to the area.
  */
+//添加实体对象更新
 Instance.prototype.addEntity = function(e) {
   var entities = this.entities;
   var players = this.players;

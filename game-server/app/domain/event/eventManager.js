@@ -29,6 +29,8 @@ exp.addEvent = function(entity){
  * Add save event for player
  * @param {Object} player The player to add save event for.
  */
+//通过同步工具，回写相关信息到数据库.
+//pomelo-sync 的模块提供了exec方法，当函数收到save事件后，执行exec，将操作行为放到数据库队列里，每隔一段时间执行
 function addSaveEvent(player) {
 	var app = pomelo.app;
 	player.on('save', function() {
