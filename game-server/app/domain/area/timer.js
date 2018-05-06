@@ -10,7 +10,7 @@ var Timer = function(opts){
 module.exports = Timer;
 
 Timer.prototype.run = function () {
-  this.interval = setInterval(this.tick.bind(this), this.interval);
+  this.interval = setInterval(this.tick.bind(this), this.interval);  //定时执行tick
 };
 
 Timer.prototype.close = function () {
@@ -22,26 +22,26 @@ Timer.prototype.tick = function() {
 
   //Update mob zones
   for(var key in area.zones){
-    area.zones[key].update();
+    area.zones[key].update();  //遍历  所有zones的更新. 定时刷怪
   }
 
   //Update all the items
-  for(var id in area.items) {
+  for(var id in area.items) {  //检查人物状态值
     var item = area.entities[id];
-    item.update();
+    item.update();  //检查用户生命时间，若到0，则玩家状态变为死亡
 
-    if(item.died) {
+    if(item.died) {            //如果主角死亡，向客户端发送消息
       area.channel.pushMessage('onRemoveEntities', {entities: [id]});
       area.removeEntity(id);
     }
   }
 
   //run all the action
-  area.actionManager.update();
+  area.actionManager.update();  //动作更新. 将日常攻击，移动的动作寄存在一个一个队列里面，定时将队列里面的动作执行和清空
 
-  area.aiManager.update();
+  area.aiManager.update();      //ai 更新，检查ai反应动作. ai根据行为树，做出反应，让怪物可以主动攻击玩家
 
-  area.patrolManager.update();
+  area.patrolManager.update();  //patrol巡逻动作更新. 怪物巡逻
 };
 
 /**

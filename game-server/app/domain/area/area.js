@@ -25,11 +25,11 @@ var Instance = function(opts){
   this.map = opts.map;
 
   //The map from player to entity
-  this.players = {};
+  this.players = {};   //玩家
   this.users = {};
-  this.entities = {};
-  this.zones = {};
-  this.items = {};
+  this.entities = {};  //实体
+  this.zones = {};     //地区
+  this.items = {};     //物品
   this.channel = null;
 
   this.playerNum = 0;
@@ -37,9 +37,9 @@ var Instance = function(opts){
   //Init AOI
   this.aoi = aoiManager.getService(opts);
 
-  this.aiManager = ai.createManager({area:this});
-  this.patrolManager = patrol.createManager({area:this});
-  this.actionManager = new ActionManager();
+  this.aiManager = ai.createManager({area:this});         //怪物ai 工厂方法
+  this.patrolManager = patrol.createManager({area:this}); //patrol 巡逻工厂方法
+  this.actionManager = new ActionManager();               //action  动作工厂方法
 
   this.timer = new Timer({
     area : this,
@@ -55,13 +55,19 @@ module.exports = Instance;
  * @api public
  */
 Instance.prototype.start = function() {
-  aoiEventManager.addEvent(this, this.aoi.aoi);
+  aoiEventManager.addEvent(this, this.aoi.aoi);  //aoi监听事件
 
   //Init mob zones
-  this.initMobZones(this.map.getMobZones());
-  this.initNPCs();
+  this.initMobZones(this.map.getMobZones());     //初始化怪物空间
+  this.initNPCs();                               //初始化NPC
 
+    //AI管理服务启动
+    //初始化AI行为，读取game-server/app/api/brain/目录下的ai行为文件，利用提供pomelo-bt行为树来控制ai的策略，
+    //通过aiManager注册brain。当用户利用addEntity添加实例的时候，将ai行为添加到该实体
   this.aiManager.start();
+
+    //地图设计器，定时执行地图内的处理信息任务
+    //执行地图的tick，轮训地图内的变量，当变量有变化的时候，通知客户端
   this.timer.run();
 };
 
@@ -73,6 +79,7 @@ Instance.prototype.close = function(){
  * Init npcs
  * @api private
  */
+//读取game-server/config/data/npc.json生成npc人物
 Instance.prototype.initNPCs = function() {
   var npcs = this.map.getNPCs();
 
@@ -106,6 +113,7 @@ Instance.prototype.getChannel = function() {
  * Init all zones in area
  * @api private
  */
+//读取相对目录./map/mobzone.js文件，初始化MobZone，通过读取game-server/config/data/character.js on文件来初始化
 Instance.prototype.initMobZones = function(mobZones) {
   for(var i = 0; i < mobZones.length; i++) {
     var opts = mobZones[i];
