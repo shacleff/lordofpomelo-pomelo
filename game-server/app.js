@@ -13,8 +13,8 @@ var sync = require('pomelo-sync-plugin');
 /**
  * Init app for client
  */
-var app = pomelo.createApp();
-app.set('name', 'lord of pomelo');
+var app = pomelo.createApp();       //创建Application
+app.set('name', 'lord of pomelo');  //设置Application的名字
 
 // configure for global
 app.configure('production|development', function() {
