@@ -14,6 +14,7 @@
 2.  mysql数据库搭建
     * 使用 mysql -uroot -p 输入密码登陆mysql数据库
 	* 使用 `game-server/config/scheme/Pomelo.sql` 创建项目数据库
+	* origin pwd: jianan123456
 3. 修改 `shared/config/mysql.json` 数据库连接配置
 4. 分别开启游戏服务器与 Web 服务器
     1. `pomelo start -e development`
