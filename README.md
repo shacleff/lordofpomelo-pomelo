@@ -20,6 +20,7 @@
     1. `pomelo start -e development`
     2. `node app`
 5. 浏览器打开 `http://127.0.0.1:3001/`，开始体验吧
+
    不知道为啥开始一直访问http://127.0.0.1:3001/index.html 一直注册不了，报错，这个index.html是哪里来的
 
 ## 附录
