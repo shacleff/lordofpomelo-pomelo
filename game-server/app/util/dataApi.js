@@ -1,3 +1,7 @@
+/**
+ * 配置文件数据接口
+ */
+
 // require json files
 var area = require('../../config/data/area');
 var character = require('../../config/data/character');
@@ -18,8 +22,8 @@ var team = require('../../config/data/team');
  *
  */
 var Data = function(data) {
-  var fields = {};
-  data[1].forEach(function(i, k) {
+  var fields = {}; 
+  data[1].forEach(function(i, k) {  
     fields[i] = k;
   });
   data.splice(0, 2);
