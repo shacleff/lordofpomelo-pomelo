@@ -1,2 +1,2 @@
 var cpus = os.cpus();
-result = util.inspect(cpus,true,null);
+result = util.inspect(cpus, true, null);

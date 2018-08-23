@@ -1,34 +1,37 @@
 var fs = require('fs');
 
 exports = module.exports;
- 
-exports.rmdirSync = (function(){
-    function iterator(url,dirs){
+
+/**
+ * 同步删除
+ */
+exports.rmdirSync = (function () {
+    function iterator(url, dirs) {
         var stat = fs.statSync(url);
-        if(stat.isDirectory()){
+        if (stat.isDirectory()) {
             dirs.unshift(url);
-            inner(url,dirs);
-        }else if(stat.isFile()){
+            inner(url, dirs);
+        } else if (stat.isFile()) {
             fs.unlinkSync(url);
         }
     }
-    function inner(path,dirs){
+    function inner(path, dirs) {
         var arr = fs.readdirSync(path);
-        for(var i = 0, el ; el = arr[i++];){
-            iterator(path+"/"+el,dirs);
+        for (var i = 0, el; el = arr[i++];) {
+            iterator(path + "/" + el, dirs);
         }
     }
-    return function(dir,cb){
-        cb = cb || function(){};
+    return function (dir, cb) {
+        cb = cb || function () { };
         var dirs = [];
- 
-        try{
-            iterator(dir,dirs);
-            for(var i = 0, el ; el = dirs[i++];){
+
+        try {
+            iterator(dir, dirs);
+            for (var i = 0, el; el = dirs[i++];) {
                 fs.rmdirSync(el);
             }
             cb()
-        }catch(e){
+        } catch (e) {
             e.code === "ENOENT" ? cb() : cb(e);
         }
     }
@@ -52,8 +55,8 @@ exports.mkdirSync = function mkdir(url, mode, cb) {
     if (arr[0] == "..") {
         arr.splice(0, 2, arr[0] + "/" + arr[1]);
     }
-    if(arr[0] == ""){
-          arr[0] = "/";
+    if (arr[0] == "") {
+        arr[0] = "/";
     }
     function inner(cur) {
         if (!path.existsSync(cur)) {
@@ -75,7 +78,7 @@ exports.mkdirSync = function mkdir(url, mode, cb) {
  * @param {String} origin
  * @param {String} target
  */
-exports.copySync = function copy (origin, target) {
+exports.copySync = function copy(origin, target) {
     if (!fs.existsSync(origin)) {
         console.log(origin + 'is not exist......');
     }
