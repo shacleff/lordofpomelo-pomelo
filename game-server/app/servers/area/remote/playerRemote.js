@@ -16,13 +16,14 @@ var messageService = require('../../../domain/messageService');
 var exp = module.exports;
 
 /**
+ * 功能：玩家离开地图后，暂存玩家信息到数据库中
  * Player exits. It will persistent player's state in the database.
  *
  * @param {Object} args
  * @param {Function} cb
  * @api public
  */
-exp.playerLeave = function(args, cb){
+exp.playerLeave = function (args, cb) {
   var playerId = args.playerId;
   var area = pomelo.app.areaManager.getArea(args.instanceId);
   var player = area.getPlayer(playerId);
@@ -30,28 +31,28 @@ exp.playerLeave = function(args, cb){
   utils.myPrint('1 ~ areaId = ', area.areaId);
   utils.myPrint('2 ~ instanceId = ', args.instanceId);
   utils.myPrint('3 ~ args = ', JSON.stringify(args));
-  if(!player){
+  if (!player) {
     logger.warn('player not in the area ! %j', args);
     return;
   }
   var sceneId = player.areaId;
 
-  if(!player) {
+  if (!player) {
     utils.invokeCallback(cb);
     return;
   }
 
-  var params = {playerId: playerId, teamId: player.teamId};
+  var params = { playerId: playerId, teamId: player.teamId };
   pomelo.app.rpc.manager.teamRemote.leaveTeamById(null, params,
-    function(err, ret) {
+    function (err, ret) {
     });
 
-  if(player.hp === 0){
-    player.hp = Math.floor(player.maxHp/2);
+  if (player.hp === 0) {
+    player.hp = Math.floor(player.maxHp / 2);
   }
 
   //If player is in a instance, move to the scene
-  if(area.type !== consts.AreaType.SCENE){
+  if (area.type !== consts.AreaType.SCENE) {
     var pos = areaService.getBornPoint(sceneId);
     player.x = pos.x;
     player.y = pos.y;
@@ -62,11 +63,12 @@ exp.playerLeave = function(args, cb){
   equipmentsDao.update(player.equipments);
   taskDao.tasksUpdate(player.curTasks);
   area.removePlayer(playerId);
-  area.channel.pushMessage({route: 'onUserLeave', code: consts.MESSAGE.RES, playerId: playerId});
+  area.channel.pushMessage({ route: 'onUserLeave', code: consts.MESSAGE.RES, playerId: playerId });
   utils.invokeCallback(cb);
 };
 
-exp.leaveTeam = function(args, cb){
+// 离开队伍
+exp.leaveTeam = function (args, cb) {
   var playerId = args.playerId;
   var area = pomelo.app.areaManager.getArea(args.instanceId);
   var player = area.getPlayer(playerId);
@@ -75,7 +77,7 @@ exp.leaveTeam = function(args, cb){
   utils.myPrint('LeaveTeam ~ instanceId = ', args.instanceId);
   utils.myPrint('LeaveTeam ~ args = ', JSON.stringify(args));
   var err = null;
-  if(!player){
+  if (!player) {
     err = 'Player leave team error(no player in area)!';
     utils.invokeCallback(cb, err);
     return;
@@ -98,7 +100,14 @@ exp.leaveTeam = function(args, cb){
       isCaptain: player.isCaptain,
       teamName: consts.TEAM.DEFAULT_NAME
     },
-    {x: player.x, y: player.y}, {});
+    {
+      x: player.x,
+      y: player.y
+    },
+    {
+
+    }
+  );
 
   utils.invokeCallback(cb);
 };

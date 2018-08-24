@@ -12,41 +12,41 @@ var dataApi = require('../../../util/dataApi');
  * @param {Session} session
  * @api public
  */
-
-handler.equip = function(msg, session, next) {
-	var player = session.area.getPlayer(session.get('playerId'));
+handler.equip = function (msg, session, next) {
+  var player = session.area.getPlayer(session.get('playerId'));
   var status = false;
 
   var item = player.bag.items[msg.index];
   var bagIndex = -1;
   if (item) {
-    var eq =  dataApi.equipment.findById(item.id);
-		if(!eq || player.level < eq.heroLevel){
-			next(null, {status: false});
-			return;
-		}
+    var eq = dataApi.equipment.findById(item.id);
+    if (!eq || player.level < eq.heroLevel) {
+      next(null, { status: false });
+      return;
+    }
 
     bagIndex = player.equip(eq.kind, eq.id);
     player.bag.removeItem(msg.index);
 
     status = true;
   }
-  next(null, {status: status, bagIndex: bagIndex});
+  next(null, { status: status, bagIndex: bagIndex });
 };
 
 /**
+ * 功能：卸载用户装备，处理用户请求
  * Unequip equipment, handle client' request
  *
  * @param {Object} msg
  * @param {Session} session
  * @api public
  */
-handler.unEquip = function(msg, session, next) {
-	var player = session.area.getPlayer(session.get('playerId'));
+handler.unEquip = function (msg, session, next) {
+  var player = session.area.getPlayer(session.get('playerId'));
   var status = false;
   var bagIndex = -1;
   if (msg.putInBag) {
-    bagIndex = player.bag.addItem({id: player.equipments.get(msg.type), type: 'equipment'});
+    bagIndex = player.bag.addItem({ id: player.equipments.get(msg.type), type: 'equipment' });
     if (bagIndex > 0) {
       player.unEquip(msg.type);
       status = true;
@@ -56,6 +56,6 @@ handler.unEquip = function(msg, session, next) {
     status = true;
   }
 
-  next(null, {status: status, bagIndex: bagIndex});
+  next(null, { status: status, bagIndex: bagIndex });
 };
 

@@ -25,6 +25,7 @@ Handler.prototype.queryEntry = function(msg, session, next) {
 		return;
 	}
 
+	// 分配一个connector服务器
 	var res = dispatcher.dispatch(uid, connectors);
 	next(null, {code: Code.OK, host: res.host, port: res.clientPort});
   // next(null, {code: Code.OK, host: res.pubHost, port: res.clientPort});
