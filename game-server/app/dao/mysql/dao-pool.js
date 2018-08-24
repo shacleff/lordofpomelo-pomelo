@@ -3,12 +3,12 @@ var mysql = require('mysql');
 /*
  * Create mysql connection pool.
  */
-var createMysqlPool = function(app) {
+var createMysqlPool = function (app) {
 	var mysqlConfig = app.get('mysql');
 	return _poolModule.createPool({
 		name: 'mysql',
-		create: function(callback) {
-			
+		create: function (callback) {
+
 			var client = mysql.createConnection({
 				host: mysqlConfig.host,
 				user: mysqlConfig.user,
@@ -17,12 +17,12 @@ var createMysqlPool = function(app) {
 			});
 			return client;
 		},
-		destroy: function(client) {
+		destroy: function (client) {
 			client.end();
 		},
 		max: 10,
-		idleTimeoutMillis : 30000,
-		log : false
+		idleTimeoutMillis: 30000,
+		log: false
 	});
 };
 

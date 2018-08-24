@@ -14,7 +14,7 @@ var EntityType = require('../../consts/consts').EntityType;
  * @param {Object} opts
  * @api public
  */
-var Equipment = function(opts) {
+var Equipment = function (opts) {
   Entity.call(this, opts);
   this.type = EntityType.EQUIPMENT;
   this.name = opts.name;
@@ -46,17 +46,17 @@ module.exports = Equipment;
  *
  * @api public
  */
-Equipment.prototype.update = function(){
+Equipment.prototype.update = function () {
   var next = Date.now();
   this.lifetime -= (next - this.time);
 
   this.time = next;
-  if(this.lifetime <= 0) {
+  if (this.lifetime <= 0) {
     this.died = true;
   }
 };
 
-Equipment.prototype.toJSON = function() {
+Equipment.prototype.toJSON = function () {
   return {
     entityId: this.entityId,
     kindId: this.kindId,

@@ -11,22 +11,22 @@ var instances;
 var intervel;
 var maps = {};
 
-exp.init = function(opts){
+exp.init = function (opts) {
   instances = {};
-  intervel = opts.intervel||60000;
+  intervel = opts.intervel || 60000;
 
   setInterval(check, intervel);
 };
 
-exp.create = function(params){
+exp.create = function (params) {
   var id = params.instanceId;
   var areaId = params.areaId;
 
-  if(instances[id]) return false;
+  if (instances[id]) return false;
 
   //get area map
   var opts = dataApi.area.findById(areaId);
-  if(!maps[areaId]){
+  if (!maps[areaId]) {
     maps[areaId] = new Map(opts);
   }
   opts.map = maps[areaId];
@@ -40,9 +40,9 @@ exp.create = function(params){
   return true;
 };
 
-exp.remove = function(params){
+exp.remove = function (params) {
   var id = params.id;
-  if(!instances[id]) return false;
+  if (!instances[id]) return false;
 
   var instance = instances[id];
   instance.close();
@@ -51,27 +51,27 @@ exp.remove = function(params){
   return true;
 };
 
-exp.getArea = function(instanceId){
+exp.getArea = function (instanceId) {
   return instances[instanceId].area;
 };
 
-function check(){
+function check() {
   var app = pomelo.app;
-  for(var id in instances){
+  for (var id in instances) {
     var instance = instances[id];
 
-    if(!instance.isAlive()){
+    if (!instance.isAlive()) {
       app.rpc.manager.instanceRemote.remove(null, id, onClose);
     }
   }
 }
 
-function onClose(err, id){
-  if(!err){
+function onClose(err, id) {
+  if (!err) {
     instances[id].close();
     delete instances[id];
     logger.info('remove instance : %j', id);
-  }else{
+  } else {
     logger.warn('remove instance error! id : %j, err : %j', id, err);
   }
 }

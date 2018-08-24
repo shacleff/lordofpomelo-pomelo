@@ -15,7 +15,7 @@ var id = 1;
  * @api public
  */
 
-var Entity = function(opts) {
+var Entity = function (opts) {
   EventEmitter.call(this);
   this.entityId = id++;
   this.kindId = Number(opts.kindId);
@@ -44,7 +44,7 @@ module.exports = Entity;
  * @api public
  */
 
-Entity.prototype.getEntityId = function() {
+Entity.prototype.getEntityId = function () {
   return this.entityId;
 };
 
@@ -55,8 +55,8 @@ Entity.prototype.getEntityId = function() {
  * @api public
  */
 
-Entity.prototype.getState = function() {
-  return {x: this.x, y: this.y};
+Entity.prototype.getState = function () {
+  return { x: this.x, y: this.y };
 };
 
 /**
@@ -67,7 +67,7 @@ Entity.prototype.getState = function() {
  * @api public
  */
 
-Entity.prototype.setPosition = function(x, y) {
+Entity.prototype.setPosition = function (x, y) {
   this.x = x;
   this.y = y;
 };

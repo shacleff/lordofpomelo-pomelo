@@ -21,15 +21,15 @@ var team = require('../../config/data/team');
  * @param {Array}
  *
  */
-var Data = function(data) {
-  var fields = {}; 
-  data[1].forEach(function(i, k) {  
+var Data = function (data) {
+  var fields = {};
+  data[1].forEach(function (i, k) {
     fields[i] = k;
   });
   data.splice(0, 2);
 
   var result = {}, item;
-  data.forEach(function(k) {
+  data.forEach(function (k) {
     item = mapData(fields, k);
     result[item.id] = item;
   });
@@ -45,7 +45,7 @@ var Data = function(data) {
  * @return {Object} result
  * @api private
  */
-var mapData = function(fields, item) {
+var mapData = function (fields, item) {
   var obj = {};
   for (var k in fields) {
     obj[k] = item[fields[k]];
@@ -61,7 +61,7 @@ var mapData = function(fields, item) {
  * @return {Array} result
  * @api public
  */
-Data.prototype.findBy = function(attr, value) {
+Data.prototype.findBy = function (attr, value) {
   var result = [];
   var i, item;
   for (i in this.data) {
@@ -73,7 +73,8 @@ Data.prototype.findBy = function(attr, value) {
   return result;
 };
 
-Data.prototype.findBigger = function(attr, value) {
+// 
+Data.prototype.findBigger = function (attr, value) {
   var result = [];
   value = Number(value);
   var i, item;
@@ -86,7 +87,8 @@ Data.prototype.findBigger = function(attr, value) {
   return result;
 };
 
-Data.prototype.findSmaller = function(attr, value) {
+// 
+Data.prototype.findSmaller = function (attr, value) {
   var result = [];
   value = Number(value);
   var i, item;
@@ -106,7 +108,7 @@ Data.prototype.findSmaller = function(attr, value) {
  * @return {Obj}
  * @api public
  */
-Data.prototype.findById = function(id) {
+Data.prototype.findById = function (id) {
   return this.data[id];
 };
 
@@ -116,10 +118,11 @@ Data.prototype.findById = function(id) {
  * @return {array}
  * @api public
  */
-Data.prototype.all = function() {
+Data.prototype.all = function () {
   return this.data;
 };
 
+// 
 module.exports = {
   area: new Data(area),
   character: new Data(character),
@@ -130,6 +133,6 @@ module.exports = {
   talk: new Data(talk),
   item: new Data(item),
   fightskill: new Data(fightskill),
-	task: new Data(task),
-	team: new Data(team)
+  task: new Data(task),
+  team: new Data(team)
 };

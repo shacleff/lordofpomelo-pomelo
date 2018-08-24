@@ -11,11 +11,11 @@ var fightskillDao = module.exports;
  * @param {Number} playerId 
  * @param {function} cb 
  */
-fightskillDao.add = function(skill, cb) {
+fightskillDao.add = function (skill, cb) {
 	var sql = 'insert into FightSkill (playerId, skillId, level, type ) values (?, ?, ?, ?)';
 	var args = [skill.playerId, skill.skillId, skill.level, skill.type];
 
-	pomelo.app.get('dbclient').insert(sql, args, function(err, res) {
+	pomelo.app.get('dbclient').insert(sql, args, function (err, res) {
 		if (err) {
 			logger.error(err.message);
 			utils.invokeCallback(cb, err);
@@ -31,11 +31,11 @@ fightskillDao.add = function(skill, cb) {
  * Update fight skill
  * @param val {Object} Update params, contains level and skill id
  */
-fightskillDao.update = function(val, cb) {
+fightskillDao.update = function (val, cb) {
 	var sql = 'update FightSkill set level = ? where id = ?';
 	var args = [val.level, val.id];
 
-	pomelo.app.get('dbclient').query(sql, args, function(err, res) {
+	pomelo.app.get('dbclient').query(sql, args, function (err, res) {
 		if (err) {
 			logger.error('write mysql failed!　' + sql + ' ' + JSON.stringify(val));
 		} else {
@@ -51,18 +51,18 @@ fightskillDao.update = function(val, cb) {
  * @param {Number} playerId 
  * @param {function} cb 
  */
-fightskillDao.getFightSkillsByPlayerId = function(playerId, cb) {
+fightskillDao.getFightSkillsByPlayerId = function (playerId, cb) {
 	var sql = 'select * from FightSkill where playerId = ?';
 	var args = [playerId];
 
-	pomelo.app.get('dbclient').query(sql, args, function(err, res) {
+	pomelo.app.get('dbclient').query(sql, args, function (err, res) {
 		if (err) {
 			utils.invokeCallback(cb, err);
 		} else {
 			var fightSkills = [];
-			for (var i = 0; i<res.length; i++){
+			for (var i = 0; i < res.length; i++) {
 				var result = res[i];
-				var fightSkill = fightskill.create({id: result.id, playerId: result.playerId, skillId: result.skillId, level: result.level, type: result.type});
+				var fightSkill = fightskill.create({ id: result.id, playerId: result.playerId, skillId: result.skillId, level: result.level, type: result.type });
 				fightSkills.push(fightSkill);
 			}
 			utils.invokeCallback(cb, null, fightSkills);

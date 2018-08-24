@@ -29,8 +29,7 @@
 /**
  * @constructor
  */
-WebInspector.DOMStorage = function(id, domain, isLocalStorage)
-{
+WebInspector.DOMStorage = function (id, domain, isLocalStorage) {
     this._id = id;
     this._domain = domain;
     this._isLocalStorage = isLocalStorage;
@@ -38,28 +37,24 @@ WebInspector.DOMStorage = function(id, domain, isLocalStorage)
 
 WebInspector.DOMStorage.prototype = {
     /** @return {string} */
-    get id()
-    {
+    get id() {
         return this._id;
     },
 
     /** @return {string} */
-    get domain()
-    {
+    get domain() {
         return this._domain;
     },
 
     /** @return {boolean} */
-    get isLocalStorage()
-    {
+    get isLocalStorage() {
         return this._isLocalStorage;
     },
 
     /**
      * @param {function(?Protocol.Error, Array.<DOMStorageAgent.Entry>):void=} callback
      */
-    getEntries: function(callback)
-    {
+    getEntries: function (callback) {
         DOMStorageAgent.getDOMStorageEntries(this._id, callback);
     },
 
@@ -68,8 +63,7 @@ WebInspector.DOMStorage.prototype = {
      * @param {string} value
      * @param {function(?Protocol.Error, boolean):void=} callback
      */
-    setItem: function(key, value, callback)
-    {
+    setItem: function (key, value, callback) {
         DOMStorageAgent.setDOMStorageItem(this._id, key, value, callback);
     },
 
@@ -77,8 +71,7 @@ WebInspector.DOMStorage.prototype = {
      * @param {string} key
      * @param {function(?Protocol.Error, boolean):void=} callback
      */
-    removeItem: function(key, callback)
-    {
+    removeItem: function (key, callback) {
         DOMStorageAgent.removeDOMStorageItem(this._id, key, callback);
     }
 }
@@ -87,8 +80,7 @@ WebInspector.DOMStorage.prototype = {
  * @constructor
  * @extends {WebInspector.Object}
  */
-WebInspector.DOMStorageModel = function()
-{
+WebInspector.DOMStorageModel = function () {
     this._storages = {};
     InspectorBackend.registerDOMStorageDispatcher(new WebInspector.DOMStorageDispatcher(this));
     DOMStorageAgent.enable();
@@ -103,8 +95,7 @@ WebInspector.DOMStorageModel.prototype = {
     /**
      * @param {WebInspector.DOMStorage} domStorage
      */
-    _addDOMStorage: function(domStorage)
-    {
+    _addDOMStorage: function (domStorage) {
         this._storages[domStorage.id] = domStorage;
         this.dispatchEventToListeners(WebInspector.DOMStorageModel.Events.DOMStorageAdded, domStorage);
     },
@@ -112,8 +103,7 @@ WebInspector.DOMStorageModel.prototype = {
     /**
      * @param {DOMStorageAgent.StorageId} storageId
      */
-    _domStorageUpdated: function(storageId)
-    {
+    _domStorageUpdated: function (storageId) {
         this.dispatchEventToListeners(WebInspector.DOMStorageModel.Events.DOMStorageUpdated, this._storages[storageId]);
     },
 
@@ -121,16 +111,14 @@ WebInspector.DOMStorageModel.prototype = {
      * @param {DOMStorageAgent.StorageId} storageId
      * @return {WebInspector.DOMStorage}
      */
-    storageForId: function(storageId)
-    {
+    storageForId: function (storageId) {
         return this._storages[storageId];
     },
 
     /**
      * @return {Array.<WebInspector.DOMStorage>}
      */
-    storages: function()
-    {
+    storages: function () {
         var result = [];
         for (var storageId in this._storages)
             result.push(this._storages[storageId]);
@@ -145,8 +133,7 @@ WebInspector.DOMStorageModel.prototype = {
  * @implements {DOMStorageAgent.Dispatcher}
  * @param {WebInspector.DOMStorageModel} model
  */
-WebInspector.DOMStorageDispatcher = function(model)
-{
+WebInspector.DOMStorageDispatcher = function (model) {
     this._model = model;
 }
 
@@ -155,8 +142,7 @@ WebInspector.DOMStorageDispatcher.prototype = {
     /**
      * @param {DOMStorageAgent.Entry} payload
      */
-    addDOMStorage: function(payload)
-    {
+    addDOMStorage: function (payload) {
         this._model._addDOMStorage(new WebInspector.DOMStorage(
             payload.id,
             payload.origin,
@@ -166,8 +152,7 @@ WebInspector.DOMStorageDispatcher.prototype = {
     /**
      * @param {string} storageId
      */
-    domStorageUpdated: function(storageId)
-    {
+    domStorageUpdated: function (storageId) {
         this._model._domStorageUpdated(storageId);
     }
 }

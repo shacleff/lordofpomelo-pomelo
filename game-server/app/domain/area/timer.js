@@ -2,9 +2,9 @@ var messageService = require('./../messageService');
 var EntityType = require('../../consts/consts').EntityType;
 var logger = require('pomelo-logger').getLogger(__filename);
 
-var Timer = function(opts){
+var Timer = function (opts) {
   this.area = opts.area;
-  this.interval = opts.interval||100;
+  this.interval = opts.interval || 100;
 };
 
 module.exports = Timer;
@@ -17,21 +17,21 @@ Timer.prototype.close = function () {
   clearInterval(this.interval);
 };
 
-Timer.prototype.tick = function() {
+Timer.prototype.tick = function () {
   var area = this.area;
 
   //Update mob zones
-  for(var key in area.zones){
+  for (var key in area.zones) {
     area.zones[key].update();
   }
 
   //Update all the items
-  for(var id in area.items) {
+  for (var id in area.items) {
     var item = area.entities[id];
     item.update();
 
-    if(item.died) {
-      area.channel.pushMessage('onRemoveEntities', {entities: [id]});
+    if (item.died) {
+      area.channel.pushMessage('onRemoveEntities', { entities: [id] });
       area.removeEntity(id);
     }
   }
@@ -49,7 +49,7 @@ Timer.prototype.tick = function() {
  * @param action {Object} The action need to add
  * @return {Boolean}
  */
-Timer.prototype.addAction = function(action) {
+Timer.prototype.addAction = function (action) {
   return this.area.actionManager.addAction(action);
 };
 
@@ -58,7 +58,7 @@ Timer.prototype.addAction = function(action) {
  * @param type {Number} The type of the action
  * @param id {Id} The id of the action
  */
-Timer.prototype.abortAction = function(type, id) {
+Timer.prototype.abortAction = function (type, id) {
   return this.area.actionManager.abortAction(type, id);
 };
 
@@ -66,7 +66,7 @@ Timer.prototype.abortAction = function(type, id) {
  * Abort all action for a given id in area
  * @param id {Number}
  */
-Timer.prototype.abortAllAction = function(id) {
+Timer.prototype.abortAllAction = function (id) {
   this.area.actionManager.abortAllAction(id);
 };
 
@@ -74,12 +74,12 @@ Timer.prototype.abortAllAction = function(id) {
  * Enter AI for given entity
  * @param entityId {Number} entityId
  */
-Timer.prototype.enterAI = function(entityId) {
+Timer.prototype.enterAI = function (entityId) {
   var area = this.area;
 
   area.patrolManager.removeCharacter(entityId);
   this.abortAction('move', entityId);
-  if(!!area.entities[entityId]) {
+  if (!!area.entities[entityId]) {
     area.aiManager.addCharacters([area.entities[entityId]]);
   }
 };
@@ -88,13 +88,13 @@ Timer.prototype.enterAI = function(entityId) {
  * Enter patrol for given entity
  * @param entityId {Number}
  */
-Timer.prototype.patrol = function(entityId) {
+Timer.prototype.patrol = function (entityId) {
   var area = this.area;
 
   area.aiManager.removeCharacter(entityId);
 
-  if(!!area.entities[entityId]) {
-    area.patrolManager.addCharacters([{character: area.entities[entityId], path: area.entities[entityId].path}]);
+  if (!!area.entities[entityId]) {
+    area.patrolManager.addCharacters([{ character: area.entities[entityId], path: area.entities[entityId].path }]);
   }
 };
 
@@ -105,7 +105,7 @@ Timer.prototype.patrol = function(entityId) {
  * @param newPos {Object} New position.
  * @return {Boolean} If the update success.
  */
-Timer.prototype.updateObject = function(obj, oldPos, newPos) {
+Timer.prototype.updateObject = function (obj, oldPos, newPos) {
   return this.area.aoi.updateObject(obj, oldPos, newPos);
 };
 
@@ -116,17 +116,17 @@ Timer.prototype.updateObject = function(obj, oldPos, newPos) {
  * @param ignoreList {Array} The ignore watchers' list.
  * @return {Array} The qualified watchers id list.
  */
-Timer.prototype.getWatcherUids = function(pos, types, ignoreList) {
+Timer.prototype.getWatcherUids = function (pos, types, ignoreList) {
   var area = this.area;
 
   var watchers = area.aoi.getWatchers(pos, types);
   var result = [];
-  if(!!watchers && !! watchers[EntityType.PLAYER]) {
+  if (!!watchers && !!watchers[EntityType.PLAYER]) {
     var pWatchers = watchers[EntityType.PLAYER];
-    for(var entityId in pWatchers) {
+    for (var entityId in pWatchers) {
       var player = area.getEntity(entityId);
-      if(!!player && !! player.userId && (!ignoreList || !ignoreList[player.userId])) {
-        result.push({uid:player.userId, sid : player.serverId});
+      if (!!player && !!player.userId && (!ignoreList || !ignoreList[player.userId])) {
+        result.push({ uid: player.userId, sid: player.serverId });
       }
     }
   }
@@ -140,7 +140,7 @@ Timer.prototype.getWatcherUids = function(pos, types, ignoreList) {
  * @param types {Array} Given watcher types.
  * @return {Array} Watchers find by given parameters.
  */
-Timer.prototype.getWatchers = function(pos, types) {
+Timer.prototype.getWatchers = function (pos, types) {
   return this.area.aoi.getWatchers(pos, types);
 };
 
@@ -153,6 +153,6 @@ Timer.prototype.getWatchers = function(pos, types) {
  * @param newRange {Number} The new range of the watcher.
  * @return Boolean If the update is success.
  */
-Timer.prototype.updateWatcher = function(watcher, oldPos, newPos, oldRange, newRange) {
+Timer.prototype.updateWatcher = function (watcher, oldPos, newPos, oldRange, newRange) {
   return this.area.aoi.updateWatcher(watcher, oldPos, newPos, oldRange, newRange);
 };

@@ -16,7 +16,7 @@ equipmentsDao.createEquipments = function (playerId, cb) {
 	var sql = 'insert into Equipments (playerId) values (?)';
 	var args = [playerId];
 
-	pomelo.app.get('dbclient').insert(sql, args, function(err, res) {
+	pomelo.app.get('dbclient').insert(sql, args, function (err, res) {
 		if (err) {
 			logger.error('create equipments for equipmentDao failed! ' + err.stack);
 			utils.invokeCallback(cb, err, null);
@@ -33,11 +33,11 @@ equipmentsDao.createEquipments = function (playerId, cb) {
  * @param {Number} playerId 
  * @param {funciton} cb 
  */
-equipmentsDao.getEquipmentsByPlayerId = function(playerId, cb) {
+equipmentsDao.getEquipmentsByPlayerId = function (playerId, cb) {
 	var sql = 'select * from Equipments where playerId = ?';
 	var args = [playerId];
 
-	pomelo.app.get('dbclient').query(sql, args, function(err, res) {
+	pomelo.app.get('dbclient').query(sql, args, function (err, res) {
 		if (err) {
 			logger.error('get equipments by playerId for equipmentsDao failed! ' + err.stack);
 			utils.invokeCallback(cb, err, null);
@@ -47,7 +47,7 @@ equipmentsDao.getEquipmentsByPlayerId = function(playerId, cb) {
 				var equips = new Equipments(result);
 				utils.invokeCallback(cb, null, equips);
 			} else {
-				logger.error('equipments not exist!! ' );
+				logger.error('equipments not exist!! ');
 				utils.invokeCallback(cb, new Error('equipments not exist '));
 			}
 		}
@@ -59,11 +59,11 @@ equipmentsDao.getEquipmentsByPlayerId = function(playerId, cb) {
  * @param {Object} val Update params, in a object.
  * @param {function} cb
  */
-equipmentsDao.update = function(val, cb) {
+equipmentsDao.update = function (val, cb) {
 	var sql = 'update Equipments set weapon = ?, armor = ?, helmet = ?, necklace = ?, ring = ?, belt = ?, amulet = ?, legguard = ?, shoes = ?	where id = ?';
 	var args = [val.weapon, val.armor, val.helmet, val.necklace, val.ring, val.belt, val.amulet, val.legguard, val.shoes, val.id];
 
-	pomelo.app.get('dbclient').query(sql, args, function(err, res) {
+	pomelo.app.get('dbclient').query(sql, args, function (err, res) {
 		utils.invokeCallback(cb, err, res);
 	});
 };
@@ -74,11 +74,11 @@ equipmentsDao.update = function(val, cb) {
  * @param {number} playerId
  * @param {function} cb
  */
-equipmentsDao.destroy = function(playerId, cb) {
+equipmentsDao.destroy = function (playerId, cb) {
 	var sql = 'delete from Equipments where playerId = ?';
 	var args = [playerId];
 
-	pomelo.app.get('dbclient').query(sql, args, function(err, res) {
+	pomelo.app.get('dbclient').query(sql, args, function (err, res) {
 		utils.invokeCallback(cb, err, res);
 	});
 };

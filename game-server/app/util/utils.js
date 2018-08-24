@@ -7,8 +7,8 @@ var isPrintFlag = false;
 /**
  * Check and invoke callback function
  */
-utils.invokeCallback = function(cb) {
-  if(!!cb && typeof cb === 'function') {
+utils.invokeCallback = function (cb) {
+  if (!!cb && typeof cb === 'function') {
     cb.apply(null, Array.prototype.slice.call(arguments, 1));
   }
 };
@@ -16,28 +16,29 @@ utils.invokeCallback = function(cb) {
 /**
  * clone an object
  */
-utils.clone = function(origin) {
-  if(!origin) {
+utils.clone = function (origin) {
+  if (!origin) {
     return;
   }
 
   var obj = {};
-  for(var f in origin) {
-    if(origin.hasOwnProperty(f)) {
+  for (var f in origin) {
+    if (origin.hasOwnProperty(f)) {
       obj[f] = origin[f];
     }
   }
   return obj;
 };
 
-utils.size = function(obj) {
-  if(!obj) {
+// 
+utils.size = function (obj) {
+  if (!obj) {
     return 0;
   }
 
   var size = 0;
-  for(var f in obj) {
-    if(obj.hasOwnProperty(f)) {
+  for (var f in obj) {
+    if (obj.hasOwnProperty(f)) {
       size++;
     }
   }
@@ -46,9 +47,9 @@ utils.size = function(obj) {
 };
 
 // print the file name and the line number ~ begin
-function getStack(){
+function getStack() {
   var orig = Error.prepareStackTrace;
-  Error.prepareStackTrace = function(_, stack) {
+  Error.prepareStackTrace = function (_, stack) {
     return stack;
   };
   var err = new Error();
@@ -58,23 +59,26 @@ function getStack(){
   return stack;
 }
 
+// 
 function getFileName(stack) {
   return stack[1].getFileName();
 }
 
-function getLineNumber(stack){
+// 
+function getLineNumber(stack) {
   return stack[1].getLineNumber();
 }
 
-utils.myPrint = function() {
+// 
+utils.myPrint = function () {
   if (isPrintFlag) {
     var len = arguments.length;
-    if(len <= 0) {
+    if (len <= 0) {
       return;
     }
     var stack = getStack();
     var aimStr = '\'' + getFileName(stack) + '\' @' + getLineNumber(stack) + ' :\n';
-    for(var i = 0; i < len; ++i) {
+    for (var i = 0; i < len; ++i) {
       aimStr += arguments[i] + ' ';
     }
     console.log('\n' + aimStr);
