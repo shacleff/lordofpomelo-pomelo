@@ -92,20 +92,16 @@ exp.leaveTeam = function (args, cb) {
 
   utils.myPrint('2 ~ LeaveTeam ~ playerId, player.teamId = ', playerId, player.teamId);
 
-  messageService.pushMessageByAOI(area,
-    {
+  messageService.pushMessageByAOI(area, {
       route: 'onTeamMemberStatusChange',
       playerId: playerId,
       teamId: player.teamId,
       isCaptain: player.isCaptain,
       teamName: consts.TEAM.DEFAULT_NAME
-    },
-    {
+    },{
       x: player.x,
       y: player.y
-    },
-    {
-
+    },{
     }
   );
 
