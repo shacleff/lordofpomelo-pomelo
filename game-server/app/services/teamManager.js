@@ -1,6 +1,3 @@
-/**
- * Module dependencies
- */
 var Team = require('../domain/entity/team');
 var consts = require('../consts/consts');
 var utils = require('../util/utils');
@@ -8,20 +5,20 @@ var logger = require('pomelo-logger').getLogger(__filename);
 
 var exp = module.exports;
 
-// global team container(teamId:teamObj)
-var gTeamObjDict = {};
-// global team id
-var gTeamId = 0;
+var gTeamObjDict = {}; // 全局组容器 key:teamId  value:teamObj
+var gTeamId = 0; // 全局会自增的teamId
 
-// create new team, add the player(captain) to the team
-exp.createTeam = function (data) {
+exp.createTeam = function (data) { // 创建一个队伍，添加首领到这个队伍中(房间中添加房主???)
   var teamObj = new Team(++gTeamId);
   var result = teamObj.addPlayer(data, true);
   if (result === consts.TEAM.JOIN_TEAM_RET_CODE.OK) {
     teamObj.setCaptainId(data.playerId);
     gTeamObjDict[teamObj.teamId] = teamObj;
   }
-  return { result: result, teamId: teamObj.teamId };
+  return {
+    result: result,
+    teamId: teamObj.teamId
+  };
 };
 
 exp.getTeamById = function (teamId) {
@@ -29,10 +26,12 @@ exp.getTeamById = function (teamId) {
   return teamObj || null;
 };
 
-exp.disbandTeamById = function (playerId, teamId) {
+exp.disbandTeamById = function (playerId, teamId) { // 根据teamId和playerId删除一个玩家
   var teamObj = gTeamObjDict[teamId];
   if (!teamObj || !teamObj.isCaptainById(playerId)) {
-    return { result: consts.TEAM.FAILED };
+    return { 
+      result: consts.TEAM.FAILED 
+    };
   }
 
   var ret = teamObj.disbandTeam();
@@ -42,9 +41,6 @@ exp.disbandTeamById = function (playerId, teamId) {
   return ret;
 };
 
-// check member num when a member leaves the team,
-// if there is no member in the team,
-// disband the team automatically
 exp.try2DisbandTeam = function (teamObj) {
   if (!teamObj.isTeamHasMember()) {
     delete gTeamObjDict[teamObj.teamId];
@@ -128,7 +124,6 @@ exp.inviteJoinTeam = function (args) {
       result = consts.TEAM.OK;
     }
   }
-
   return { result: result };
 };
 
