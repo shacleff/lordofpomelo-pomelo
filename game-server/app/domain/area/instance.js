@@ -20,7 +20,7 @@ Instance.prototype.getArea = function () {
   return this.area;
 };
 
-Instance.prototype.isAlive = function () {
+Instance.prototype.isAlive = function () { // 一直空荡荡的，则认为是死区了
   if (this.area.isEmpty()) {
     if ((Date.now() - this.area.emptyTime) > this.lifeTime) {
       return false;

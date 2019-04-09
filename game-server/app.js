@@ -28,7 +28,7 @@ app.configure('production|development', function () {
 
 	//Set areasIdMap, a map from area id to serverId.
 	if (app.serverType !== 'master') {
-		var areas = app.get('servers').area;
+		var areas = app.get('servers').area;  // 统一为area服务器-->area + instance 2类服务器
 		var areaIdMap = {};
 		for (var id in areas) {
 			areaIdMap[areas[id].area] = areas[id].id;
@@ -72,6 +72,8 @@ app.configure('production|development', 'area', function () {
 	app.before(playerFilter());
 
 	var server = app.curServer;
+
+	// 为app.areaManager赋值
 	if (server.instance) { // 实例服务器
 		instancePool.init(require('./config/instance.json'));
 		app.areaManager = instancePool;
