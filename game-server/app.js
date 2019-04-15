@@ -108,7 +108,7 @@ app.configure('production|development', 'area|auth|connector|master', function (
 });
 
 app.configure('production|development', 'connector', function () {
-    var dictionary = app.components['__dictionary__'];
+    var dictionary = app.components.__dictionary__;
     var dict = null;
     if (!!dictionary) {
         dict = dictionary.getDict();
