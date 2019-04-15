@@ -1,26 +1,16 @@
 var utils = module.exports;
+var isPrintFlag = true; // 是否打印日志
 
-// control variable of func "myPrint"
-var isPrintFlag = false;
-// var isPrintFlag = true;
-
-/**
- * Check and invoke callback function
- */
-utils.invokeCallback = function (cb) {
+utils.invokeCallback = function (cb) { // 检查参数，调用函数
   if (!!cb && typeof cb === 'function') {
     cb.apply(null, Array.prototype.slice.call(arguments, 1));
   }
 };
 
-/**
- * clone an object
- */
-utils.clone = function (origin) {
+utils.clone = function (origin) { // 克隆一个对象
   if (!origin) {
     return;
   }
-
   var obj = {};
   for (var f in origin) {
     if (origin.hasOwnProperty(f)) {
@@ -30,24 +20,20 @@ utils.clone = function (origin) {
   return obj;
 };
 
-// 
-utils.size = function (obj) {
+utils.size = function (obj) { // 对象属性个数
   if (!obj) {
     return 0;
   }
-
   var size = 0;
   for (var f in obj) {
     if (obj.hasOwnProperty(f)) {
       size++;
     }
   }
-
   return size;
 };
 
-// print the file name and the line number ~ begin
-function getStack() {
+function getStack() { // 文件名和行号
   var orig = Error.prepareStackTrace;
   Error.prepareStackTrace = function (_, stack) {
     return stack;
@@ -59,18 +45,15 @@ function getStack() {
   return stack;
 }
 
-// 
 function getFileName(stack) {
   return stack[1].getFileName();
 }
 
-// 
 function getLineNumber(stack) {
   return stack[1].getLineNumber();
 }
 
-// 
-utils.myPrint = function () {
+utils.myPrint = function () { // 列行等信息也打印出来
   if (isPrintFlag) {
     var len = arguments.length;
     if (len <= 0) {
@@ -84,5 +67,4 @@ utils.myPrint = function () {
     console.log('\n' + aimStr);
   }
 };
-// print the file name and the line number ~ end
 

@@ -5,18 +5,14 @@ var consts = require('../consts/consts');
 var logger = require('pomelo-logger').getLogger(__filename);
 var INSTANCE_SERVER = 'area';
 
-//The instance map, key is instanceId, value is serverId
-var instances = {};
+var instances = {}; // 实例map， key:服务器实例instanceId  value: serverId
 
-//All the instance servers
-var instanceServers = [];
+var instanceServers = []; // 所有的服务器实例
 
 var exp = module.exports;
-
 exp.addServers = function (servers) {
   for (var i = 0; i < servers.length; i++) {
     var server = servers[i];
-
     if (server.serverType === 'area' && server.instance) {
       instanceServers.push(server);
     }
@@ -26,32 +22,24 @@ exp.addServers = function (servers) {
 exp.removeServers = function (servers) {
   for (var i = 0; i < servers.length; i++) {
     var server = servers[i];
-
     if (server.serverType === 'area' && server.instance) {
       exp.removeServer(server.id);
     }
   }
-
   logger.info('remove servers : %j', servers);
 };
 
 exp.getInstance = function (args, cb) {
-  //The key of instance
-  var instanceId = args.areaId + '_' + args.id;
-
-  //If the instance exist, return the instance
-  if (instances[instanceId]) {
+  var instanceId = args.areaId + '_' + args.id; // instance的key
+  if (instances[instanceId]) { // 实例存在，则返回
     utils.invokeCallback(cb, null, instances[instanceId]);
     return;
   }
 
-  var app = pomelo.app;
+  var app = pomelo.app; // 不仅可以通过参数传递，这样直接require进来的直接用也可以取到全局app对像 
+  var serverId = getServerId(); // 得到一个服务id
 
-  //Allocate a server id
-  var serverId = getServerId();
-
-  //rpc invoke
-  var params = {
+  var params = { // rpc服务器调用
     namespace: 'user',
     service: 'areaRemote',
     method: 'create',
@@ -67,12 +55,10 @@ exp.getInstance = function (args, cb) {
       utils.invokeCallback(cb, err);
       return;
     }
-
     instances[instanceId] = {
       instanceId: instanceId,
       serverId: serverId
     };
-
     utils.invokeCallback(cb, null, instances[instanceId]);
   });
 
@@ -82,20 +68,18 @@ exp.remove = function (instanceId) {
   if (instances[instanceId]) delete instances[instanceId];
 };
 
-//Get the server to create the instance
 var count = 0;
-function getServerId() {
-  if (count >= instanceServers.length) count = 0;
-
+function getServerId() { // 返回实例的id
+  if (count >= instanceServers.length) {
+    count = 0;
+  }
   var server = instanceServers[count];
-
   count++;
   return server.id;
 }
 
 function filter(req) {
   var playerId = req.playerId;
-
   return true;
 }
 

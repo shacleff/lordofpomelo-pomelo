@@ -45,12 +45,12 @@ module.exports = {
   },
 
   EntityType: {
-    PLAYER:      'player',
-    NPC:         'npc',
-    MOB:         'mob',
-    EQUIPMENT:   'equipment',
-    ITEM:        'item',
-    BAG:         'bag'
+    PLAYER: 'player',
+    NPC: 'npc',
+    MOB: 'mob',
+    EQUIPMENT: 'equipment',
+    ITEM: 'item',
+    BAG: 'bag'
   },
 
   Pick: {
