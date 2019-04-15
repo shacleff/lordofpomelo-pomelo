@@ -128,7 +128,7 @@ var checkDuplicate = function (service, uid, channelName) {
 /**
  * Add records for the specified user
  */
-var addRecord = function (service, uid, name, sid, channelName) {
+var addRecord = function (service, uid, name, sid, channelName) { // 不知道为什么不写成：一个prototype方法...
   var record = { uid: uid, name: name, sid: sid };
   service.uidMap[uid] = record;
   service.nameMap[name] = record;
