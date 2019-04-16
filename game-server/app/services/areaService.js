@@ -6,12 +6,9 @@ var taskDao = require('../dao/taskDao');
 var Map = require('../domain/map/map');
 var AreaType = require('../consts/consts').AreaType;
 var async = require('async');
-
-// 日志
 var logger = require('pomelo-logger').getLogger(__filename);
 
 var maps = {};
-
 var exp = module.exports;
 
 exp.init = function () {
@@ -27,19 +24,11 @@ exp.init = function () {
   }
 };
 
-/**
- * Proxy for map, get born place for given map
- * @api public
- */
-exp.getBornPlace = function (sceneId) {
+exp.getBornPlace = function (sceneId) { // 得到出生地
   return maps[sceneId].getBornPlace();
 };
 
-/**
- * Proxy for map, get born point for given map
- * @api public
- */
-exp.getBornPoint = function (sceneId) {
+exp.getBornPoint = function (sceneId) { // 得到出生点
   return maps[sceneId].getBornPoint();
 };
 
@@ -49,7 +38,7 @@ exp.getBornPoint = function (sceneId) {
  * @param cb {funciton} Call back funciton
  * @api public
  */
-exp.changeArea = function (args, session, cb) {
+exp.changeArea = function (args, session, cb) { // 玩家从地图一个地方传送到另外一个地方
   var app = pomelo.app;
   var area = session.area;
   var uid = args.uid;
@@ -62,9 +51,7 @@ exp.changeArea = function (args, session, cb) {
 
   if (targetInfo.type === AreaType.SCENE) {
     area.removePlayer(playerId);
-
     var pos = this.getBornPoint(target);
-
     player.areaId = target;
     player.isInTeamInstance = false;
     player.instanceId = 0;
@@ -93,9 +80,8 @@ exp.changeArea = function (args, session, cb) {
     });
   } else {
     var closure = this;
-    async.series([
+    async.series([ // 并发执行
       function (callback) {
-        //Construct params
         var params = { areaId: args.target };
         params.id = playerId;
 
@@ -130,7 +116,6 @@ exp.changeArea = function (args, session, cb) {
                   }
                 });
             }
-
             callback(null);
           }
         });

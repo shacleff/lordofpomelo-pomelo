@@ -1,3 +1,6 @@
+/**
+ * 副本管理
+ */
 var pomelo = require('pomelo');
 var utils = require('../util/utils');
 var dataApi = require('../util/dataApi');

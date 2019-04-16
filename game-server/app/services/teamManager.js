@@ -29,8 +29,8 @@ exp.getTeamById = function (teamId) {
 exp.disbandTeamById = function (playerId, teamId) { // 根据teamId和playerId删除一个玩家
   var teamObj = gTeamObjDict[teamId];
   if (!teamObj || !teamObj.isCaptainById(playerId)) {
-    return { 
-      result: consts.TEAM.FAILED 
+    return {
+      result: consts.TEAM.FAILED
     };
   }
 
@@ -171,10 +171,8 @@ exp.chatInTeam = function (args) {
   if (teamObj && teamObj.pushChatMsg2All(args.content)) {
     result = consts.TEAM.OK;
   }
-
   return { result: result };
 };
-
 
 exp.kickOut = function (args, cb) {
   if (!args || !args.teamId) {
