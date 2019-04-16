@@ -43,12 +43,7 @@ userDao.getUserInfo = function (username, passwd, cb) {
 	});
 };
 
-/**
- * Get an user's all players by userId
- * @param {Number} uid User Id.
- * @param {function} cb Callback function.
- */
-userDao.getPlayersByUid = function (uid, cb) {
+userDao.getPlayersByUid = function (uid, cb) { // uid查询用户信息
 	var sql = 'select * from Player where userId = ?';
 	var args = [uid];
 
@@ -88,12 +83,7 @@ userDao.getPlayer = function (playerId, cb) {
 	});
 };
 
-/**
- * get by Name
- * @param {String} name Player name
- * @param {function} cb Callback function
- */
-userDao.getPlayerByName = function (name, cb) {
+userDao.getPlayerByName = function (name, cb) { // 根据名字查询用户信息
 	var sql = 'select * from Player where name = ?';
 	var args = [name];
 
@@ -108,13 +98,8 @@ userDao.getPlayerByName = function (name, cb) {
 	});
 };
 
-/**
- * Get all the information of a player, include equipments, bag, skills, tasks.
- * @param {String} playerId
- * @param {function} cb
- */
-userDao.getPlayerAllInfo = function (playerId, cb) {
-	async.parallel([
+userDao.getPlayerAllInfo = function (playerId, cb) { // 从mysql得到用户所有信息：装备、背包、技能、任务
+	async.parallel([ // 并行执行，将最终结果存储在最后的一个回调函数参数数组中
 		function (callback) {
 			userDao.getPlayer(playerId, function (err, player) {
 				if (!!err || !player) {
@@ -175,13 +160,8 @@ userDao.getPlayerAllInfo = function (playerId, cb) {
 		});
 };
 
-/**
- * Get userInfo by username
- * @param {String} username
- * @param {function} cb
- */
-userDao.getUserByName = function (username, cb) {
-	var sql = 'select * from	User where name = ?';
+userDao.getUserByName = function (username, cb) { // 根据用户名查询mysql中用户信息
+	var sql = 'select * from User where name = ?';
 	var args = [username];
 	pomelo.app.get('dbclient').query(sql, args, function (err, res) {
 		if (err !== null) {
@@ -198,13 +178,8 @@ userDao.getUserByName = function (username, cb) {
 	});
 };
 
-/**
- * get user infomation by userId
- * @param {String} uid UserId
- * @param {function} cb Callback function
- */
 userDao.getUserById = function (uid, cb) {
-	var sql = 'select * from	User where id = ?';
+	var sql = 'select * from User where id = ?';
 	var args = [uid];
 	pomelo.app.get('dbclient').query(sql, args, function (err, res) {
 		if (err !== null) {
@@ -213,18 +188,13 @@ userDao.getUserById = function (uid, cb) {
 		}
 
 		if (!!res && res.length > 0) {
-			utils.invokeCallback(cb, null, new User(res[0]));
+			utils.invokeCallback(cb, null, new User(res[0])); // 数据库查询返回用户信息
 		} else {
 			utils.invokeCallback(cb, ' user not exist ', null);
 		}
 	});
 };
 
-/**
- * delete user by username
- * @param {String} username
- * @param {function} cb Call back function.
- */
 userDao.deleteByName = function (username, cb) {
 	var sql = 'delete from	User where name = ?';
 	var args = [username];
@@ -241,13 +211,6 @@ userDao.deleteByName = function (username, cb) {
 	});
 };
 
-/**
- * Create a new user
- * @param (String) username
- * @param {String} password
- * @param {String} from Register source
- * @param {function} cb Call back function.
- */
 userDao.createUser = function (username, password, from, cb) {
 	var sql = 'insert into User (name,password,`from`,loginCount,lastLoginTime) values(?,?,?,?,?)';
 	var loginTime = Date.now();
@@ -255,20 +218,13 @@ userDao.createUser = function (username, password, from, cb) {
 	pomelo.app.get('dbclient').insert(sql, args, function (err, res) {
 		if (err !== null) {
 			utils.invokeCallback(cb, { code: err.number, msg: err.message }, null);
-		} else {
+		} else { // 创建User成功，把user信息返回给客户端
 			var user = new User({ id: res.insertId, name: username, password: password, loginCount: 1, lastLoginTime: loginTime });
 			utils.invokeCallback(cb, null, user);
 		}
 	});
 };
 
-/**
- * Create a new player
- * @param {String} uid User id.
- * @param {String} name Player's name in the game.
- * @param {Number} roleId Player's roleId, decide which kind of player to create.
- * @param {function} cb Callback function
- */
 userDao.createPlayer = function (uid, name, roleId, cb) {
 	var sql = 'insert into Player (userId, kindId, kindName, name, country, rank, level, experience, attackValue, defenceValue, hitRate, dodgeRate, walkSpeed, attackSpeed, hp, mp, maxHp, maxMp, areaId, x, y, skillPoint) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 	//var role = dataApi.role.findById(roleId);
@@ -312,15 +268,9 @@ userDao.createPlayer = function (uid, name, roleId, cb) {
 	});
 };
 
-/**
- * Update a player
- * @param {Object} player The player need to update, all the propties will be update.
- * @param {function} cb Callback function.
- */
-userDao.updatePlayer = function (player, cb) {
+userDao.updatePlayer = function (player, cb) { // 将玩家信息更新到数据库中
 	var sql = 'update Player set x = ? ,y = ? , hp = ?, mp = ? , maxHp = ?, maxMp = ?, country = ?, rank = ?, level = ?, experience = ?, areaId = ?, attackValue = ?, defenceValue = ?, walkSpeed = ?, attackSpeed = ? , skillPoint = ? where id = ?';
 	var args = [player.x, player.y, player.hp, player.mp, player.maxHp, player.maxMp, player.country, player.rank, player.level, player.experience, player.areaId, player.attackValue, player.defenceValue, player.walkSpeed, player.attackSpeed, player.skillPoint, player.id];
-
 	pomelo.app.get('dbclient').query(sql, args, function (err, res) {
 		if (err !== null) {
 			utils.invokeCallback(cb, err.message, null);
@@ -335,11 +285,6 @@ userDao.updatePlayer = function (player, cb) {
 	});
 };
 
-/**
- * Delete player
- * @param {Number} playerId
- * @param {function} cb Callback function.
- */
 userDao.deletePlayer = function (playerId, cb) {
 	var sql = 'delete from	Player where id = ?';
 	var args = [playerId];

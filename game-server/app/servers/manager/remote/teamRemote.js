@@ -1,3 +1,6 @@
+/**
+ * 组队服务器
+ */
 var utils = require('../../../util/utils');
 var teamManager = require('../../../services/teamManager');
 

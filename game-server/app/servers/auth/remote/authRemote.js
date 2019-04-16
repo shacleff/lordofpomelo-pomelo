@@ -32,7 +32,7 @@ pro.auth = function (token, cb) {
 		return;
 	}
 
-	if (!checkExpire(res, this.expire)) {
+	if (!checkExpire(res, this.expire)) { // token是否过期
 		cb(null, Code.ENTRY.FA_TOKEN_EXPIRE);
 		return;
 	}

@@ -1,3 +1,6 @@
+/**
+ * 寻路服务器-->属于计算密集型任务，寻路逻辑从场景逻辑独立出来
+ */
 var Map = require('../../../domain/map/map');
 var dataApi = require('../../../util/dataApi');
 var utils = require('../../../util/utils');

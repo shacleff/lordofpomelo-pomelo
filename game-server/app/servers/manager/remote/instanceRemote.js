@@ -1,3 +1,6 @@
+/**
+ * 副本服务器-->负责全局管理副本全生命周期 和组队相关操作的服务器
+ */
 var utils = require('../../../util/utils');
 var instanceManager = require('../../../services/instanceManager');
 var exp = module.exports;

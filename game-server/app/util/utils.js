@@ -1,3 +1,6 @@
+/**
+ * 打印日志等函数
+ */
 var utils = module.exports;
 var isPrintFlag = true; // 是否打印日志
 
