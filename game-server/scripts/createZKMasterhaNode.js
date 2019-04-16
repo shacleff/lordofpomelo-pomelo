@@ -3,11 +3,8 @@
 var zookeeper = require('node-zookeeper-client');
 var client = zookeeper.createClient('localhost:2181');
 var zkPath = process.argv[2] || '/pomelo/master';
-
-// 
 var path = require('path')
 
-// 
 var tmpL = zkPath.split('/');
 
 if (tmpL.length !== 3 || tmpL[0].length > 0 || tmpL[1].length === 0 || tmpL[2].length === 0) {
@@ -15,7 +12,6 @@ if (tmpL.length !== 3 || tmpL[0].length > 0 || tmpL[1].length === 0 || tmpL[2].l
   return;
 }
 
-// 
 client.once('connected', function () {
   console.log('Connected to the server.');
 
@@ -35,11 +31,8 @@ client.once('connected', function () {
       }
       client.close();
     });
-
   });
-
 });
 
-// 
 client.connect();
 
