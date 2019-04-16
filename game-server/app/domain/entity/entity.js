@@ -16,7 +16,7 @@ var Entity = function (opts) {
   this.area = opts.area;
 };
 
-util.inherits(Entity, EventEmitter);
+util.inherits(Entity, EventEmitter);  // 继承于事件发射器
 
 module.exports = Entity;
 
@@ -24,24 +24,12 @@ Entity.prototype.getEntityId = function () {
   return this.entityId;
 };
 
-/**
- * Get state
- *
- * @return {Object}
- * @api public
- */
-
 Entity.prototype.getState = function () {
-  return { x: this.x, y: this.y };
+  return {
+    x: this.x,
+    y: this.y
+  };
 };
-
-/**
- * Set positon of this entityId
- *
- * @param {Number} x
- * @param {Number} y
- * @api public
- */
 
 Entity.prototype.setPosition = function (x, y) {
   this.x = x;

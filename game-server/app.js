@@ -26,8 +26,7 @@ app.configure('production|development', function () {
         app.registerAdmin(onlineUser, { app: app });
     }
 
-    //Set areasIdMap, a map from area id to serverId.
-    if (app.serverType !== 'master') {
+    if (app.serverType !== 'master') { // 场景与服务器之间的映射
         var areas = app.get('servers').area;
         var areaIdMap = {};
         for (var id in areas) {
@@ -103,8 +102,7 @@ app.configure('production|development', 'manager', function () { // 增加和移
 app.configure('production|development', 'area|auth|connector|master', function () { // mysql数据库配置-->可以为多个服务器配置
     var dbclient = require('./app/dao/mysql/mysql').init(app);
     app.set('dbclient', dbclient);
-    // app.load(pomelo.sync, {path:__dirname + '/app/dao/mapping', dbclient: dbclient});
-    app.use(sync, { sync: { path: __dirname + '/app/dao/mapping', dbclient: dbclient } });
+    app.use(sync, { sync: { path: __dirname + '/app/dao/mapping', dbclient: dbclient } }); // 数据同步插件: eventManager中同步数据使用
 });
 
 app.configure('production|development', 'connector', function () {
@@ -136,6 +134,12 @@ app.configure('production|development', 'chat', function () {
     app.set('chatService', new ChatService(app));
 });
 
+/**
+ * master是默认插件，在app.start后加载，启动master服务
+ * master组件会负责启动其它所有服务
+ *   1.master服务启动其它所有服务器，在服务器启动完毕后，其中的monitor组件会连到master对应的监听端口上，表明该服务器启动完毕
+ *   2.在所有服务器读启动后，master会调用所有服务器上的afterStart接口，来进行启动后的处理工作
+ */
 app.start();
 
 process.on('uncaughtException', function (err) {
