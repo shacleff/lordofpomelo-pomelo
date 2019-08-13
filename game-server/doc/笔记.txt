@@ -1,22 +1,25 @@
-# 官方mmorpg项目学习笔记
+官方mmorpg项目学习笔记
 
-## 1)gate
+1)gate
 
-## 2)connector
+2)connector
+  (1)2个
 
-## 3)path
+3)path
 
-## 4)manager
+4)manager
 
-## 5)auth
+5)auth
 
-## 6)chat
+6)chat
 
-## 7)area(多台)
+7)area
+  (1)3area
+  (2)3instance
 
-## 8)app.js
-*  各种配置
-*  app对所有服务器来说是一个全局变量
+8)app.js
+  (1)各种配置
+  (2)app对所有服务器来说是一个全局变量
 
-## 9)全局对象
-*  team和teamManager的关系就像是Room和RoomManager的关系
+9)全局对象
+  (1)team和teamManager的关系就像是Room和RoomManager的关系
