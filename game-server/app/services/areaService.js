@@ -12,24 +12,24 @@ var maps = {};
 var exp = module.exports;
 
 exp.init = function () {
-  var areas = dataApi.area.all();
+    var areas = dataApi.area.all();
 
-  //Init areas
-  for (var key in areas) {
-    //init map
-    var area = areas[key];
+    //Init areas
+    for (var key in areas) {
+        //init map
+        var area = areas[key];
 
-    area.weightMap = false;
-    maps[area.id] = new Map(area);
-  }
+        area.weightMap = false;
+        maps[area.id] = new Map(area);
+    }
 };
 
 exp.getBornPlace = function (sceneId) { // 得到出生地
-  return maps[sceneId].getBornPlace();
+    return maps[sceneId].getBornPlace();
 };
 
 exp.getBornPoint = function (sceneId) { // 得到出生点
-  return maps[sceneId].getBornPoint();
+    return maps[sceneId].getBornPoint();
 };
 
 /**
@@ -39,112 +39,116 @@ exp.getBornPoint = function (sceneId) { // 得到出生点
  * @api public
  */
 exp.changeArea = function (args, session, cb) { // 玩家从地图一个地方传送到另外一个地方
-  var app = pomelo.app;
-  var area = session.area;
-  var uid = args.uid;
-  var playerId = args.playerId;
-  var target = args.target;
-  var player = area.getPlayer(playerId);
-  var frontendId = args.frontendId;
+    var app = pomelo.app;
+    var area = session.area;
+    var uid = args.uid;
+    var playerId = args.playerId;
+    var target = args.target;
+    var player = area.getPlayer(playerId);
+    var frontendId = args.frontendId;
 
-  var targetInfo = dataApi.area.findById(target);
+    var targetInfo = dataApi.area.findById(target);
 
-  if (targetInfo.type === AreaType.SCENE) {
-    area.removePlayer(playerId);
-    var pos = this.getBornPoint(target);
-    player.areaId = target;
-    player.isInTeamInstance = false;
-    player.instanceId = 0;
-    player.x = pos.x;
-    player.y = pos.y;
-    utils.myPrint("1 ~ player.teamId = ", player.teamId);
-    userDao.updatePlayer(player, function (err, success) {
-      if (err || !success) {
-        err = err || 'update player failed!';
-        utils.invokeCallback(cb, err);
-      } else {
-        session.set('areaId', target);
-        session.set('serverId', app.get('areaIdMap')[target]);
-        session.set('teamId', player.teamId);
-        session.set('isCaptain', player.isCaptain);
-        session.set('isInTeamInstance', player.isInTeamInstance);
-        session.set('instanceId', player.instanceId);
-        session.pushAll(function (err) {
-          if (err) {
-            logger.error('Change area for session service failed! error is : %j', err.stack);
-          }
-          utils.invokeCallback(cb, null);
-          utils.myPrint("2 ~ player.teamId = ", player.teamId);
-        });
-      }
-    });
-  } else {
-    var closure = this;
-    async.series([ // 并发执行
-      function (callback) {
-        var params = { areaId: args.target };
-        params.id = playerId;
-
-        if (targetInfo.type === AreaType.TEAM_INSTANCE && player.teamId) {
-          params.id = player.teamId;
-        }
-
-        utils.myPrint('params.id, player.teamId = ', params.id, player.teamId);
-        utils.myPrint('playerId = ', player.id);
-        player.isInTeamInstance = true;
-        //Get target instance
-        app.rpc.manager.instanceRemote.create(session, params, function (err, result) {
-          if (err) {
-            logger.error('get Instance error!');
-            callback(err, 'getInstance');
-          } else {
-            session.set('instanceId', result.instanceId);
-            session.set('serverId', result.serverId);
-            session.set('teamId', player.teamId);
-            session.set('isCaptain', player.isCaptain);
-            session.set('isInTeamInstance', player.isInTeamInstance);
-            session.pushAll();
-            player.instanceId = result.instanceId;
-            utils.myPrint('player.instanceId = ', player.instanceId);
-
-            if (player.isCaptain && player.teamId && targetInfo.type === AreaType.TEAM_INSTANCE) {
-              utils.myPrint('DragMember2gameCopy is running ...');
-              app.rpc.manager.teamRemote.dragMember2gameCopy(null, { teamId: player.teamId, target: target },
-                function (err, ret) {
-                  if (!!err) {
-                    logger.error(err, ret);
-                  }
-                });
-            }
-            callback(null);
-          }
-        });
-      },
-      function (cb) {
+    if (targetInfo.type === AreaType.SCENE) {
         area.removePlayer(playerId);
-
-        var pos = closure.getBornPoint(target);
+        var pos = this.getBornPoint(target);
+        player.areaId = target;
+        player.isInTeamInstance = false;
+        player.instanceId = 0;
         player.x = pos.x;
         player.y = pos.y;
-
+        utils.myPrint("1 ~ player.teamId = ", player.teamId);
         userDao.updatePlayer(player, function (err, success) {
-          if (err || !success) {
-            err = err || 'update player failed!';
-            cb(err, 'update');
-          } else {
-            cb(null);
-          }
+            if (err || !success) {
+                err = err || 'update player failed!';
+                utils.invokeCallback(cb, err);
+            } else {
+                session.set('areaId', target);
+                session.set('serverId', app.get('areaIdMap')[target]);
+                session.set('teamId', player.teamId);
+                session.set('isCaptain', player.isCaptain);
+                session.set('isInTeamInstance', player.isInTeamInstance);
+                session.set('instanceId', player.instanceId);
+                session.pushAll(function (err) {
+                    if (err) {
+                        logger.error('Change area for session service failed! error is : %j', err.stack);
+                    }
+                    utils.invokeCallback(cb, null);
+                    utils.myPrint("2 ~ player.teamId = ", player.teamId);
+                });
+            }
         });
-      }
-    ],
-      function (err, result) {
-        if (!!err) {
-          utils.invokeCallback(cb, err);
-          logger.warn('change area failed! args: %j', args);
-        } else {
-          utils.invokeCallback(cb, null);
-        }
-      }
-    );
-  }
+    } else {
+        var closure = this;
+        async.series([ // 并发执行
+                function (callback) {
+                    var params = {areaId: args.target};
+                    params.id = playerId;
+
+                    if (targetInfo.type === AreaType.TEAM_INSTANCE && player.teamId) {
+                        params.id = player.teamId;
+                    }
+
+                    utils.myPrint('params.id, player.teamId = ', params.id, player.teamId);
+                    utils.myPrint('playerId = ', player.id);
+                    player.isInTeamInstance = true;
+
+                    //Get target instance
+                    app.rpc.manager.instanceRemote.create(session, params, function (err, result) {
+                        if (err) {
+                            logger.error('get Instance error!');
+                            callback(err, 'getInstance');
+                        } else {
+                            session.set('instanceId', result.instanceId);
+                            session.set('serverId', result.serverId);
+                            session.set('teamId', player.teamId);
+                            session.set('isCaptain', player.isCaptain);
+                            session.set('isInTeamInstance', player.isInTeamInstance);
+                            session.pushAll();
+                            player.instanceId = result.instanceId;
+                            utils.myPrint('player.instanceId = ', player.instanceId);
+
+                            if (player.isCaptain && player.teamId && targetInfo.type === AreaType.TEAM_INSTANCE) {
+                                utils.myPrint('DragMember2gameCopy is running ...');
+                                app.rpc.manager.teamRemote.dragMember2gameCopy(null, {
+                                        teamId: player.teamId,
+                                        target: target
+                                    },
+                                    function (err, ret) {
+                                        if (!!err) {
+                                            logger.error(err, ret);
+                                        }
+                                    });
+                            }
+                            callback(null);
+                        }
+                    });
+                },
+                function (cb) {
+                    area.removePlayer(playerId);
+
+                    var pos = closure.getBornPoint(target);
+                    player.x = pos.x;
+                    player.y = pos.y;
+
+                    userDao.updatePlayer(player, function (err, success) {
+                        if (err || !success) {
+                            err = err || 'update player failed!';
+                            cb(err, 'update');
+                        } else {
+                            cb(null);
+                        }
+                    });
+                }
+            ],
+            function (err, result) {
+                if (!!err) {
+                    utils.invokeCallback(cb, err);
+                    logger.warn('change area failed! args: %j', args);
+                } else {
+                    utils.invokeCallback(cb, null);
+                }
+            }
+        );
+    }
 };

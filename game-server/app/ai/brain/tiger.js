@@ -15,88 +15,88 @@ var consts = require('../../consts/consts');
  * Find the nearby target if have no target.
  * Begin to patrol if nothing to do.
  */
-var Brain = function(blackboard) {
-	this.blackboard = blackboard;
-	//try attack and move to target action
-	var attack = new TryAndAdjust({
-		blackboard: blackboard, 
-		adjustAction: new MoveToTarget({
-			blackboard: blackboard
-		}), 
-		tryAction: new TryAttack({
-			blackboard: blackboard, 
-			getSkillId: function(bb) {
-				return 1; //normal attack
-			}
-		})
-	});
+var Brain = function (blackboard) {
+    this.blackboard = blackboard;
+    //try attack and move to target action
+    var attack = new TryAndAdjust({
+        blackboard: blackboard,
+        adjustAction: new MoveToTarget({
+            blackboard: blackboard
+        }),
+        tryAction: new TryAttack({
+            blackboard: blackboard,
+            getSkillId: function (bb) {
+                return 1; //normal attack
+            }
+        })
+    });
 
-	//loop attack action
-	var checkTarget = function(bb) {
-		if(bb.curTarget !== bb.curCharacter.target) {
-			// target has change
-			bb.curTarget = null;
-			return false;
-		}
+    //loop attack action
+    var checkTarget = function (bb) {
+        if (bb.curTarget !== bb.curCharacter.target) {
+            // target has change
+            bb.curTarget = null;
+            return false;
+        }
 
-		return !!bb.curTarget;
-	};
+        return !!bb.curTarget;
+    };
 
-	var loopAttack = new Loop({
-		blackboard: blackboard, 
-		child: attack, 
-		loopCond: checkTarget
-	});
+    var loopAttack = new Loop({
+        blackboard: blackboard,
+        child: attack,
+        loopCond: checkTarget
+    });
 
-	//if have target then loop attack action
-	var haveTarget = function(bb) {
-		var character = bb.curCharacter;
-		var targetId = character.target;
-		var target = bb.area.getEntity(targetId);
+    //if have target then loop attack action
+    var haveTarget = function (bb) {
+        var character = bb.curCharacter;
+        var targetId = character.target;
+        var target = bb.area.getEntity(targetId);
 
-		if(!target) {
-			// target has disappeared
-			character.forgetHater(targetId);
-			bb.curTarget = null;
-			return false;
-		}
+        if (!target) {
+            // target has disappeared
+            character.forgetHater(targetId);
+            bb.curTarget = null;
+            return false;
+        }
 
-		if(target.type === consts.EntityType.PLAYER) {
-			bb.curTarget = targetId;
-			return true;
-		}
-		return false;
-	};
+        if (target.type === consts.EntityType.PLAYER) {
+            bb.curTarget = targetId;
+            return true;
+        }
+        return false;
+    };
 
-	var attackIfHaveTarget = new If({
-		blackboard: blackboard, 
-		cond: haveTarget, 
-		action: loopAttack
-	});
+    var attackIfHaveTarget = new If({
+        blackboard: blackboard,
+        cond: haveTarget,
+        action: loopAttack
+    });
 
-	//find nearby target action
-	//var findTarget = new FindNearbyPlayer({blackboard: blackboard});
-	//patrol action
-	var patrol = new Patrol({blackboard: blackboard});
+    //find nearby target action
+    //var findTarget = new FindNearbyPlayer({blackboard: blackboard});
+    //patrol action
+    var patrol = new Patrol({blackboard: blackboard});
 
-	//composite them together
-	this.action = new Select({
-		blackboard: blackboard
-	});
+    //composite them together
+    this.action = new Select({
+        blackboard: blackboard
+    });
 
-	this.action.addChild(attackIfHaveTarget);
-	//this.action.addChild(findTarget);
-	this.action.addChild(patrol);
+    this.action.addChild(attackIfHaveTarget);
+    //this.action.addChild(findTarget);
+    this.action.addChild(patrol);
 };
 
 var pro = Brain.prototype;
 
-pro.update = function() {
-	return this.action.doAction();
+pro.update = function () {
+    return this.action.doAction();
 };
 
-module.exports.clone = function(opts) {
-	return new Brain(opts.blackboard);
+module.exports.clone = function (opts) {
+    return new Brain(opts.blackboard);
 };
 
 module.exports.name = 'tiger';

@@ -15,14 +15,17 @@ exports.rmdirSync = (function () {
             fs.unlinkSync(url);
         }
     }
+
     function inner(path, dirs) {
         var arr = fs.readdirSync(path);
         for (var i = 0, el; el = arr[i++];) {
             iterator(path + "/" + el, dirs);
         }
     }
+
     return function (dir, cb) {
-        cb = cb || function () { };
+        cb = cb || function () {
+        };
         var dirs = [];
 
         try {
@@ -58,14 +61,14 @@ exports.mkdirSync = function mkdir(url, mode, cb) {
     if (arr[0] == "") {
         arr[0] = "/";
     }
+
     function inner(cur) {
         if (!path.existsSync(cur)) {
             fs.mkdirSync(cur, mode);
         }
         if (arr.length) {
             inner(cur + "/" + arr.shift());
-        }
-        else {
+        } else {
             cb();
         }
     }
@@ -98,9 +101,7 @@ exports.copySync = function copy(origin, target) {
             if (fs.statSync(oCurrent).isFile()) {
                 fs.writeFileSync(tCurrent, fs.readFileSync(oCurrent, ''), '');
                 console.log('   \x1b[36mcreatefile\x1b[0m : ' + oCurrent);
-            }
-
-            else if (fs.statSync(oCurrent).isDirectory()) {
+            } else if (fs.statSync(oCurrent).isDirectory()) {
                 copy(oCurrent, tCurrent);
             }
         }

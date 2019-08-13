@@ -9,30 +9,31 @@ var util = require('util');
  * Try to do a action and return success if the action success.
  * If fail then do the adjustment and try it again when adjust return success.
  *
- * @param opts {Object} 
- *				opts.blackboard {Object} blackboard
- *				opts.adjustAction {BTNode} adjust action
- *				opts.tryAction {BTNode} try action}
+ * @param opts {Object}
+ *                opts.blackboard {Object} blackboard
+ *                opts.adjustAction {BTNode} adjust action
+ *                opts.tryAction {BTNode} try action}
  */
-var Node = function(opts) {
-	BTNode.call(this, opts.blackboard);
+var Node = function (opts) {
+    BTNode.call(this, opts.blackboard);
 
-	var adjustAndTryAgain = new Sequence(opts);
-	adjustAndTryAgain.addChild(opts.adjustAction);
-	adjustAndTryAgain.addChild(opts.tryAction);
+    var adjustAndTryAgain = new Sequence(opts);
+    adjustAndTryAgain.addChild(opts.adjustAction);
+    adjustAndTryAgain.addChild(opts.tryAction);
 
-	var tryAndAdjust = new Select(opts);
-	tryAndAdjust.addChild(opts.tryAction);
-	tryAndAdjust.addChild(adjustAndTryAgain);
+    var tryAndAdjust = new Select(opts);
+    tryAndAdjust.addChild(opts.tryAction);
+    tryAndAdjust.addChild(adjustAndTryAgain);
 
-	this.action = tryAndAdjust;
+    this.action = tryAndAdjust;
 };
+
 util.inherits(Node, BTNode);
 
 module.exports = Node;
 
 var pro = Node.prototype;
 
-pro.doAction = function() {
-	return this.action.doAction();
+pro.doAction = function () {
+    return this.action.doAction();
 };
