@@ -1,6 +1,3 @@
-/**
- * Module dependencies
- */
 var messageService = require('../../../domain/messageService');
 var areaService = require('../../../services/areaService');
 var userDao = require('../../../dao/userDao');
@@ -50,15 +47,12 @@ handler.enterScene = function (msg, session, next) {
             player.name, channelUtil.getAreaChannelName(areaId), null);
         var map = area.map;
 
-        // temporary code
-        //Reset the player's position if current pos is unreachable
+        // 位置不可达,则重置位置
         if (!map.isReachable(player.x, player.y)) {
-            // {
             var pos = map.getBornPoint();
             player.x = pos.x;
             player.y = pos.y;
         }
-        // temporary code
 
         var data = {
             entities: area.getAreaInfo({x: player.x, y: player.y}, player.range),
@@ -72,11 +66,9 @@ handler.enterScene = function (msg, session, next) {
                 weightMap: map.collisions
             }
         };
-        // utils.myPrint("1.5 ~ GetPlayerAllInfo data = ", JSON.stringify(data));
+
         next(null, data);
 
-        utils.myPrint("2 ~ GetPlayerAllInfo player.teamId = ", player.teamId);
-        utils.myPrint("2 ~ GetPlayerAllInfo player.isCaptain = ", player.isCaptain);
         if (!area.addEntity(player)) {
             logger.error("Add player to area faild! areaId : " + player.areaId);
             next(new Error('fail to add user into area'), {
@@ -87,7 +79,7 @@ handler.enterScene = function (msg, session, next) {
         }
 
         if (player.teamId > consts.TEAM.TEAM_ID_NONE) {
-            // send player's new info to the manager server(team manager)
+            // 给管理服务器发送玩家新的信息
             var memberInfo = player.toJSON4TeamMember();
             memberInfo.backendServerId = pomelo.app.getServerId();
             pomelo.app.rpc.manager.teamRemote.updateMemberInfo(session, memberInfo,
@@ -98,14 +90,7 @@ handler.enterScene = function (msg, session, next) {
     });
 };
 
-/**
- * Change player's view.
- *
- * @param {Object} msg
- * @param {Object} session
- * @param {Function} next
- * @api public
- */
+// 改变玩家的视图
 handler.changeView = function (msg, session, next) {
     var timer = session.area.timer;
 
@@ -131,11 +116,7 @@ handler.changeView = function (msg, session, next) {
     next();
 };
 
-/**
- * 功能：玩家请求在地图内部移动
- * Player moves. Player requests move with the given movePath.
- * Handle the request from client, and response result to client
- */
+// 玩家请求在地图上移动
 handler.move = function (msg, session, next) {
     var area = session.area;
     var timer = area.timer;
@@ -153,7 +134,6 @@ handler.move = function (msg, session, next) {
             route: msg.route,
             code: consts.MESSAGE.ERR
         });
-
         return;
     }
 
@@ -167,7 +147,8 @@ handler.move = function (msg, session, next) {
     ignoreList[player.userId] = true;
     if (timer.addAction(action)) {
         player.isMoving = true;
-        //Update state
+
+        // 更新状态
         if (player.x !== path[0].x || player.y !== path[0].y) {
             timer.updateObject({id: player.entityId, type: consts.EntityType.PLAYER}, {
                 x: player.x,
@@ -185,20 +166,16 @@ handler.move = function (msg, session, next) {
             path: path,
             speed: speed
         }, path[0], ignoreList);
+
         next(null, {
             route: msg.route,
             code: consts.MESSAGE.RES
         });
-
-        // next();
     }
     next(null, {});
 };
 
-/**
- * 丢弃一个装备或者物品
- * drop equipment or item
- */
+// 丢弃一个装备或者物品
 handler.dropItem = function (msg, session, next) {
     var player = session.area.getPlayer(session.get('playerId'));
 
@@ -207,40 +184,31 @@ handler.dropItem = function (msg, session, next) {
     next(null, {status: true});
 };
 
-/**
- * 添加一个装备
- * add equipment or item
- */
+// 添加一个装备
 handler.addItem = function (msg, session, next) {
     var player = session.area.getPlayer(session.get('playerId'));
-
     var bagIndex = player.bag.addItem(msg.item);
-
     next(null, {bagIndex: bagIndex});
 };
 
-/**
- * 改变地图
- * Change area
- */
+// 改变地图
 handler.changeArea = function (msg, session, next) {
     var playerId = session.get('playerId');
     var areaId = msg.areaId;
     var target = msg.target;
 
-    utils.myPrint('areaId, target = ', areaId, target);
     if (areaId === target) {
         next(null, {success: false});
         return;
     }
-    utils.myPrint('playerId = ', playerId);
+
     var player = session.area.getPlayer(playerId);
     if (!player) {
         next(null, {success: false});
         return;
     }
 
-    // save player's data immediately
+    // 立即保存玩家的数据
     userDao.updatePlayer(player);
     bagDao.update(player.bag);
     equipmentsDao.update(player.equipments);
@@ -257,21 +225,16 @@ handler.changeArea = function (msg, session, next) {
         frontendId: session.frontendId
     };
 
-    utils.myPrint('teamId, isCaptain = ', teamId, isCaptain);
-    utils.myPrint('msg.triggerByPlayer = ', msg.triggerByPlayer);
-    utils.myPrint('changeArea is running ...');
     areaService.changeArea(req, session, function (err) {
         var args = {areaId: areaId, target: target, success: true};
         next(null, args);
     });
 };
 
-// Use item
+// 使用一个物品
 handler.useItem = function (msg, session, next) {
     var player = session.area.getPlayer(session.get('playerId'));
-
     var status = player.useItem(msg.index);
-
     next(null, {code: consts.MESSAGE.RES, status: status});
 };
 
@@ -282,15 +245,7 @@ handler.npcTalk = function (msg, session, next) {
     next();
 };
 
-/**
- * Player pick up item.
- * Handle the request from client, and set player's target
- *
- * @param {Object} msg
- * @param {Object} session
- * @param {Function} next
- * @api public
- */
+// 玩家捡起一个物品
 handler.pickItem = function (msg, session, next) {
     var area = session.area;
 
@@ -305,29 +260,19 @@ handler.pickItem = function (msg, session, next) {
     }
 
     player.target = target.entityId;
-
-    // next();
     next(null, {});
 };
 
-/**
- * 功能：玩家学习一个技能
- * Player  learn skill
- */
+// 玩家学习一个技能
 handler.learnSkill = function (msg, session, next) {
     var player = session.area.getPlayer(session.get('playerId'));
     var status = player.learnSkill(msg.skillId);
-
     next(null, {status: status, skill: player.fightSkills[msg.skillId]});
 };
 
-/**
- * 功能：玩家升级一个技能
- * Player upgrade skill
- */
+// 玩家升级一个技能
 handler.upgradeSkill = function (msg, session, next) {
     var player = session.area.getPlayer(session.get('playerId'));
     var status = player.upgradeSkill(msg.skillId);
-
     next(null, {status: status});
 };
