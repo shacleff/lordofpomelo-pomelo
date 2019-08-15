@@ -82,7 +82,8 @@ handler.enterScene = function (msg, session, next) {
             pomelo.app.rpc.manager.teamRemote.updateMemberInfo(session, memberInfo,
                 function (err, ret) {
 
-                });
+                }
+            );
         }
     });
 };

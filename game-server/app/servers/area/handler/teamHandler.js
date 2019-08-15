@@ -18,18 +18,15 @@ var Handler = function (app) {
 Handler.prototype.createTeam = function (msg, session, next) {
     var area = session.area;
     var playerId = session.get('playerId');
-    utils.myPrint('Handler ~ createTeam is running ... ~ playerId = ', playerId);
     var player = area.getPlayer(playerId);
 
     if (!player) {
-        logger.warn('The request(createTeam) is illegal, the player is null : msg = %j.', msg);
         next();
         return;
     }
 
-    // if the player is already in a team, can't create team
+    // 玩家在组中，不能创建新的组
     if (player.teamId !== consts.TEAM.TEAM_ID_NONE) {
-        logger.warn('The request(createTeam) is illegal, the player is already in a team : msg = %j.', msg);
         next();
         return;
     }
@@ -71,21 +68,15 @@ Handler.prototype.createTeam = function (msg, session, next) {
                         teamName: teamName
                     },
                     {x: player.x, y: player.y},
-                    ignoreList);
+                    ignoreList
+                );
             }
 
             next();
         });
 };
 
-/**
- * Captain disband the team, and response the result information : success(1)/failed(0)
- *
- * @param {Object} msg
- * @param {Object} session
- * @param {Function} next
- * @api public
- */
+// 队长丢弃队伍,1:成功 0:失败
 Handler.prototype.disbandTeam = function (msg, session, next) {
     var area = session.area;
     var playerId = session.get('playerId');

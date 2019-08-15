@@ -25,3 +25,4 @@
   (1)team和teamManager的关系就像是Room和RoomManager的关系
 
 10)一般会用table_manager之类的去包装
+  (1)session主动set了数据，然后用table_manager包装后，就可以给这个id指定一个牌数据等字段
