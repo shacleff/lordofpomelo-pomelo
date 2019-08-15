@@ -18,13 +18,7 @@ var Remote = function (app) {
 
 var pro = Remote.prototype;
 
-/**
- * Auth token and check whether expire.
- *
- * @param  {String}   token token string
- * @param  {Function} cb
- * @return {Void}
- */
+// 授权token, 检查是否失效
 pro.auth = function (token, cb) {
 	var res = tokenService.parse(token, this.secret);
 	if (!res) {
@@ -47,17 +41,9 @@ pro.auth = function (token, cb) {
 	});
 };
 
-/**
- * 功能：检查token是否失效
- * Check the token whether expire.
- *
- * @param  {Object} token  token info
- * @param  {Number} expire expire time
- * @return {Boolean}        true for not expire and false for expire
- */
+// 检查token是否失效
 var checkExpire = function (token, expire) {
-	if (expire < 0) {
-		// negative expire means never expire
+	if (expire < 0) { // 负数意味永不超时
 		return true;
 	}
 	return (Date.now() - token.timestamp) < expire;
