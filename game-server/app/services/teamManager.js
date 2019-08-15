@@ -26,7 +26,8 @@ exp.getTeamById = function (teamId) {
     return teamObj || null;
 };
 
-exp.disbandTeamById = function (playerId, teamId) { // 根据teamId和playerId删除一个玩家
+// 根据teamId和playerId删除一个玩家
+exp.disbandTeamById = function (playerId, teamId) {
     var teamObj = gTeamObjDict[teamId];
     if (!teamObj || !teamObj.isCaptainById(playerId)) {
         return {
@@ -64,7 +65,6 @@ exp.leaveTeamById = function (playerId, teamId, cb) {
 };
 
 exp.dragMember2gameCopy = function (args, cb) {
-    utils.myPrint('2 ~ DragMember2gameCopy ~ args = ', JSON.stringify(args));
     var teamId = args.teamId;
     if (!teamId) {
         utils.invokeCallback(cb, 'No teamId! %j', args);
@@ -166,8 +166,6 @@ exp.chatInTeam = function (args) {
     }
     var teamId = args.teamId;
     var teamObj = gTeamObjDict[teamId];
-    utils.myPrint('args = ', JSON.stringify(args));
-    utils.myPrint('teamObj = ', teamObj);
     if (teamObj && teamObj.pushChatMsg2All(args.content)) {
         result = consts.TEAM.OK;
     }

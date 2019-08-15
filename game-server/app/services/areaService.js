@@ -85,7 +85,6 @@ exp.changeArea = function (args, session, cb) { // 玩家从地图一个地方�
 
                     player.isInTeamInstance = true;
 
-                    // 虎丘目标实例
                     app.rpc.manager.instanceRemote.create(session, params, function (err, result) {
                         if (err) {
                             logger.error('get Instance error!');
