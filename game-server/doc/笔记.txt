@@ -26,3 +26,5 @@
 
 10)一般会用table_manager之类的去包装
   (1)session主动set了数据，然后用table_manager包装后，就可以给这个id指定一个牌数据等字段
+
+11)instance: 应该是副本的意思
