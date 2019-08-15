@@ -9,104 +9,98 @@ var utils = require('../../../util/utils');
 var async = require('async');
 
 module.exports = function (app) {
-	return new Handler(app);
+    return new Handler(app);
 };
 
 var Handler = function (app) {
-	this.app = app;
+    this.app = app;
 };
 
 Handler.prototype.createPlayer = function (msg, session, next) {
-	var uid = session.uid, roleId = msg.roleId, name = msg.name;
-	var self = this;
+    var uid = session.uid, roleId = msg.roleId, name = msg.name;
+    var self = this;
 
-	userDao.getPlayerByName(name, function (err, player) {
-		if (player) {
-			next(null, { code: consts.MESSAGE.ERR });
-			return;
-		}
+    userDao.getPlayerByName(name, function (err, player) {
+        if (player) {
+            next(null, {code: consts.MESSAGE.ERR});
+            return;
+        }
 
-		userDao.createPlayer(uid, name, roleId, function (err, player) {
-			if (err) {
-				logger.error('[register] fail to invoke createPlayer for ' + err.stack);
-				next(null, { code: consts.MESSAGE.ERR, error: err });
-				return;
-			} else {
-				async.parallel([
-					function (callback) {
-						equipDao.createEquipments(player.id, callback);
-					},
-					function (callback) {
-						bagDao.createBag(player.id, callback);
-					},
-					function (callback) {
-						player.learnSkill(1, callback);
-					}],
-					function (err, results) {
-						if (err) {
-							logger.error('learn skill error with player: ' + JSON.stringify(player.strip()) + ' stack: ' + err.stack);
-							next(null, { code: consts.MESSAGE.ERR, error: err });
-							return;
-						}
-						afterLogin(self.app, msg, session, { id: uid }, player.strip(), next);
-					});
-			}
-		});
-	});
+        userDao.createPlayer(uid, name, roleId, function (err, player) {
+            if (err) {
+                logger.error('[register] fail to invoke createPlayer for ' + err.stack);
+                next(null, {code: consts.MESSAGE.ERR, error: err});
+                return;
+            } else {
+                async.parallel([
+                        function (callback) {
+                            equipDao.createEquipments(player.id, callback);
+                        },
+                        function (callback) {
+                            bagDao.createBag(player.id, callback);
+                        },
+                        function (callback) {
+                            player.learnSkill(1, callback);
+                        }],
+                    function (err, results) {
+                        if (err) {
+                            logger.error('learn skill error with player: ' + JSON.stringify(player.strip()) + ' stack: ' + err.stack);
+                            next(null, {code: consts.MESSAGE.ERR, error: err});
+                            return;
+                        }
+                        afterLogin(self.app, msg, session, {id: uid}, player.strip(), next);
+                    });
+            }
+        });
+    });
 };
 
 var afterLogin = function (app, msg, session, user, player, next) {
-	async.waterfall(
-		[
-			// 
-			function (cb) {
-				session.bind(user.id, cb);
-			},
+    async.waterfall(
+        [
+            function (cb) {
+                session.bind(user.id, cb);
+            },
 
-			// 
-			function (cb) {
-				session.set('username', user.name);
-				session.set('areaId', player.areaId);
-				session.set('serverId', app.get('areaIdMap')[player.areaId]);
-				session.set('playername', player.name);
-				session.set('playerId', player.id);
-				session.on('closed', onUserLeave);
-				session.pushAll(cb);
-			},
+            function (cb) {
+                session.set('username', user.name);
+                session.set('areaId', player.areaId);
+                session.set('serverId', app.get('areaIdMap')[player.areaId]);
+                session.set('playername', player.name);
+                session.set('playerId', player.id);
+                session.on('closed', onUserLeave);
+                session.pushAll(cb);
+            },
 
-			// 
-			function (cb) {
-				app.rpc.chat.chatRemote.add(session, user.id, player.name, channelUtil.getGlobalChannelName(), cb);
-			}
-		],
+            function (cb) {
+                app.rpc.chat.chatRemote.add(session, user.id, player.name, channelUtil.getGlobalChannelName(), cb);
+            }
+        ],
 
-		// 
-		function (err) {
-			if (err) {
-				logger.error('fail to select role, ' + err.stack);
-				next(null, { code: consts.MESSAGE.ERR });
-				return;
-			}
-			next(null, { code: consts.MESSAGE.RES, user: user, player: player });
-		}
-	);
+        function (err) {
+            if (err) {
+                logger.error('fail to select role, ' + err.stack);
+                next(null, {code: consts.MESSAGE.ERR});
+                return;
+            }
+            next(null, {code: consts.MESSAGE.RES, user: user, player: player});
+        }
+    );
 };
 
 var onUserLeave = function (session, reason) {
-	if (!session || !session.uid) {
-		return;
-	}
+    if (!session || !session.uid) {
+        return;
+    }
 
-	utils.myPrint('-----2.OnUserLeave is running ...');
-	
-	var rpc = pomelo.app.rpc;
+    var rpc = pomelo.app.rpc;
 
-	// 地图服务器玩家离开
-	rpc.area.playerRemote.playerLeave(session, {
-		playerId: session.get('playerId'),
-		areaId: session.get('areaId')
-	}, null);
+    // 地图服务器玩家离开
+    rpc.area.playerRemote.playerLeave(session, {
+        playerId: session.get('playerId'),
+        areaId: session.get('areaId')
+    }, null);
 
-	// 聊天服务器踢掉
-	rpc.chat.chatRemote.kick(session, session.uid, null);
+    // 聊天服务器踢掉
+    rpc.chat.chatRemote.kick(session, session.uid, null);
 };
