@@ -27,7 +27,6 @@ handler.enterScene = function (msg, session, next) {
 
     userDao.getPlayerAllInfo(playerId, function (err, player) {
         if (err || !player) {
-            logger.error('Get user for userDao failed! ' + err.stack);
             next(new Error('fail to get user from dao'), {
                 route: msg.route,
                 code: consts.MESSAGE.ERR
@@ -41,7 +40,6 @@ handler.enterScene = function (msg, session, next) {
         player.isInTeamInstance = isInTeamInstance;
         player.instanceId = instanceId;
         areaId = player.areaId;
-        utils.myPrint("2 ~ GetPlayerAllInfo: player.instanceId = ", player.instanceId);
 
         pomelo.app.rpc.chat.chatRemote.add(session, session.uid,
             player.name, channelUtil.getAreaChannelName(areaId), null);
@@ -70,7 +68,6 @@ handler.enterScene = function (msg, session, next) {
         next(null, data);
 
         if (!area.addEntity(player)) {
-            logger.error("Add player to area faild! areaId : " + player.areaId);
             next(new Error('fail to add user into area'), {
                 route: msg.route,
                 code: consts.MESSAGE.ERR
@@ -129,7 +126,6 @@ handler.move = function (msg, session, next) {
     player.target = null;
 
     if (!area.map.verifyPath(path)) {
-        logger.warn('The path is illegal!! The path is: %j', msg.path);
         next(null, {
             route: msg.route,
             code: consts.MESSAGE.ERR

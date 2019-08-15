@@ -23,3 +23,5 @@
 
 9)全局对象
   (1)team和teamManager的关系就像是Room和RoomManager的关系
+
+10)一般会用table_manager之类的去包装
