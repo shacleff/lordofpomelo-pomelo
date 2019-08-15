@@ -1,6 +1,4 @@
-/**
- * 组队服务器
- */
+// 组队服务器
 var utils = require('../../../util/utils');
 var teamManager = require('../../../services/teamManager');
 
@@ -11,7 +9,7 @@ module.exports = function () {
 var TeamRemote = function () {
 };
 
-// can a player create a game copy
+// 是否一个玩家可以创建一个游戏副本
 TeamRemote.prototype.canCreateGameCopy = function (args, cb) {
     var playerId = args.playerId;
     var teamId = args.teamId;
@@ -46,57 +44,49 @@ TeamRemote.prototype.leaveTeamById = function (args, cb) {
     teamManager.leaveTeamById(playerId, teamId, cb);
 };
 
-// drag the team members to the game copy
+// 拖动队伍成员到游戏副本
 TeamRemote.prototype.dragMember2gameCopy = function (args, cb) {
     teamManager.dragMember2gameCopy(args, cb);
 };
 
-// applicant apply to join the team
+// 申请人应邀加入队伍
 TeamRemote.prototype.applyJoinTeam = function (args, cb) {
     utils.myPrint('ApplyJoinTeam is running ... args = ', JSON.stringify(args));
     var ret = teamManager.applyJoinTeam(args);
     utils.invokeCallback(cb, null, ret);
 };
 
-// accept applicant join team
+// 接受申请人加入队伍
 TeamRemote.prototype.acceptApplicantJoinTeam = function (args, cb) {
-    utils.myPrint('AcceptApplicantJoinTeam is running ... args = ', JSON.stringify(args));
     var ret = teamManager.acceptApplicantJoinTeam(args);
-    utils.myPrint('AcceptApplicantJoinTeam ~ ret = ', ret);
     utils.invokeCallback(cb, null, ret);
 };
 
-// captain invite a player to join the team
+// 队长邀请玩家加入队伍
 TeamRemote.prototype.inviteJoinTeam = function (args, cb) {
-    utils.myPrint('InviteJoinTeam is running ... args = ', JSON.stringify(args));
     var ret = teamManager.inviteJoinTeam(args);
     utils.invokeCallback(cb, null, ret);
 };
 
-// accept captain's invitation join team
+// 接受队长邀请加入队伍
 TeamRemote.prototype.acceptInviteJoinTeam = function (args, cb) {
-    utils.myPrint('AcceptInviteJoinTeam is running ... args = ', JSON.stringify(args));
     var ret = teamManager.acceptInviteJoinTeam(args);
-    utils.myPrint('AcceptInviteJoinTeam ~ ret = ', ret);
     utils.invokeCallback(cb, null, ret);
 };
 
-// update team member's new info
+// 更新队伍的成员信息
 TeamRemote.prototype.updateMemberInfo = function (args, cb) {
-    utils.myPrint('UpdateMemberInfo is running ... args = ', JSON.stringify(args));
     var ret = teamManager.updateMemberInfo(args);
-    utils.myPrint('UpdateMemberInfo ~ ret = ', JSON.stringify(ret));
     utils.invokeCallback(cb, null, ret);
 };
 
-// chat in team
+// 队伍内的聊天
 TeamRemote.prototype.chatInTeam = function (args, cb) {
-    utils.myPrint('ChatInTeam is running ... args = ', JSON.stringify(args));
     var ret = teamManager.chatInTeam(args);
     utils.invokeCallback(cb, null, ret);
 };
 
-// leave a team
+// 离开队伍
 TeamRemote.prototype.kickOut = function (args, cb) {
     teamManager.kickOut(args, cb);
 };

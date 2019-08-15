@@ -4,176 +4,136 @@ var dispatcher = require('../util/dispatcher');
 var Event = require('../consts/consts').Event;
 
 var ChatService = function (app) {
-  this.app = app;
-  this.uidMap = {};
-  this.nameMap = {};
-  this.channelMap = {};
+    this.app = app;
+    this.uidMap = {};
+    this.nameMap = {};
+    this.channelMap = {};
 };
 
 module.exports = ChatService;
 
-/**
- * Add player into the channel
- *
- * @param {String} uid         user id
- * @param {String} playerName  player's role name
- * @param {String} channelName channel name
- * @return {Number} see code.js
- */
+// 添加玩家到channel
 ChatService.prototype.add = function (uid, playerName, channelName) {
-  var sid = getSidByUid(uid, this.app);
-  if (!sid) {
-    return Code.CHAT.FA_UNKNOWN_CONNECTOR;
-  }
-
-  if (checkDuplicate(this, uid, channelName)) {
-    return Code.OK;
-  }
-
-  utils.myPrint('channelName = ', channelName);
-  var channel = this.app.get('channelService').getChannel(channelName, true);
-  if (!channel) {
-    return Code.CHAT.FA_CHANNEL_CREATE;
-  }
-
-  channel.add(uid, sid);
-  addRecord(this, uid, playerName, sid, channelName);
-
-  return Code.OK;
-};
-
-/**
- * User leaves the channel
- *
- * @param  {String} uid         user id
- * @param  {String} channelName channel name
- */
-ChatService.prototype.leave = function (uid, channelName) {
-  var record = this.uidMap[uid];
-  var channel = this.app.get('channelService').getChannel(channelName, true);
-
-  if (channel && record) {
-    channel.leave(uid, record.sid);
-  }
-
-  removeRecord(this, uid, channelName);
-};
-
-/**
- * Kick user from chat service.
- * This operation would remove the user from all channels and
- * clear all the records of the user.
- *
- * @param  {String} uid user id
- */
-ChatService.prototype.kick = function (uid) {
-  var channelNames = this.channelMap[uid];
-  var record = this.uidMap[uid];
-
-  if (channelNames && record) {
-    // remove user from channels
-    var channel;
-    for (var name in channelNames) {
-      channel = this.app.get('channelService').getChannel(name);
-      if (channel) {
-        channel.leave(uid, record.sid);
-      }
+    var sid = getSidByUid(uid, this.app);
+    if (!sid) {
+        return Code.CHAT.FA_UNKNOWN_CONNECTOR;
     }
-  }
 
-  clearRecords(this, uid);
+    if (checkDuplicate(this, uid, channelName)) {
+        return Code.OK;
+    }
+
+    utils.myPrint('channelName = ', channelName);
+    var channel = this.app.get('channelService').getChannel(channelName, true);
+    if (!channel) {
+        return Code.CHAT.FA_CHANNEL_CREATE;
+    }
+
+    channel.add(uid, sid);
+    addRecord(this, uid, playerName, sid, channelName);
+
+    return Code.OK;
 };
 
-/**
- * Push message by the specified channel 
- *
- * @param  {String}   channelName channel name
- * @param  {Object}   msg         message json object
- * @param  {Function} cb          callback function
- */
+// 玩家离开channel
+ChatService.prototype.leave = function (uid, channelName) {
+    var record = this.uidMap[uid];
+    var channel = this.app.get('channelService').getChannel(channelName, true);
+
+    if (channel && record) {
+        channel.leave(uid, record.sid);
+    }
+
+    removeRecord(this, uid, channelName);
+};
+
+// 把玩家从聊天服务踢出去
+ChatService.prototype.kick = function (uid) {
+    var channelNames = this.channelMap[uid];
+    var record = this.uidMap[uid];
+
+    if (channelNames && record) {
+        // 从channel踢出玩家
+        var channel;
+        for (var name in channelNames) {
+            channel = this.app.get('channelService').getChannel(name);
+            if (channel) {
+                channel.leave(uid, record.sid);
+            }
+        }
+    }
+
+    clearRecords(this, uid);
+};
+
+// 通过指定的频道推送信息
 ChatService.prototype.pushByChannel = function (channelName, msg, cb) {
-  var channel = this.app.get('channelService').getChannel(channelName);
-  if (!channel) {
-    cb(new Error('channel ' + channelName + ' dose not exist'));
-    return;
-  }
+    var channel = this.app.get('channelService').getChannel(channelName);
+    if (!channel) {
+        cb(new Error('channel ' + channelName + ' dose not exist'));
+        return;
+    }
 
-  channel.pushMessage(Event.chat, msg, cb);
+    channel.pushMessage(Event.chat, msg, cb);
 };
 
-/**
- * Push message to the specified player
- *
- * @param  {String}   playerName player's role name
- * @param  {Object}   msg        message json object
- * @param  {Function} cb         callback
- */
+// 给指定玩家推送信息
 ChatService.prototype.pushByPlayerName = function (playerName, msg, cb) {
-  var record = this.nameMap[playerName];
-  if (!record) {
-    cb(null, Code.CHAT.FA_USER_NOT_ONLINE);
-    return;
-  }
+    var record = this.nameMap[playerName];
+    if (!record) {
+        cb(null, Code.CHAT.FA_USER_NOT_ONLINE);
+        return;
+    }
 
-  this.app.get('channelService').pushMessageByUids(Event.chat, msg, [{ uid: record.uid, sid: record.sid }], cb);
+    this.app.get('channelService').pushMessageByUids(Event.chat, msg, [{uid: record.uid, sid: record.sid}], cb);
 };
 
-/**
- * Cehck whether the user has already in the channel
- */
+// 检查玩家是否在频道
 var checkDuplicate = function (service, uid, channelName) {
-  return !!service.channelMap[uid] && !!service.channelMap[uid][channelName];
+    return !!service.channelMap[uid] && !!service.channelMap[uid][channelName];
 };
 
-/**
- * Add records for the specified user
- */
-var addRecord = function (service, uid, name, sid, channelName) { // 不知道为什么不写成：一个prototype方法...
-  var record = { uid: uid, name: name, sid: sid };
-  service.uidMap[uid] = record;
-  service.nameMap[name] = record;
-  var item = service.channelMap[uid];
-  if (!item) {
-    item = service.channelMap[uid] = {};
-  }
-  item[channelName] = 1;
+// 为指定玩家添加记录
+var addRecord = function (service, uid, name, sid, channelName) {
+    var record = {uid: uid, name: name, sid: sid};
+    service.uidMap[uid] = record;
+    service.nameMap[name] = record;
+    var item = service.channelMap[uid];
+    if (!item) {
+        item = service.channelMap[uid] = {};
+    }
+    item[channelName] = 1;
 };
 
-/**
- * Remove records for the specified user and channel pair
- */
+// 根据指定的玩家和频道对，移除记录
 var removeRecord = function (service, uid, channelName) {
-  delete service.channelMap[uid][channelName];
-  if (utils.size(service.channelMap[uid])) {
-    return;
-  }
+    delete service.channelMap[uid][channelName];
+    if (utils.size(service.channelMap[uid])) {
+        return;
+    }
 
-  // if user not in any channel then clear his records
-  clearRecords(service, uid);
+    // 如果玩家不再任何频道，清空记录
+    clearRecords(service, uid);
 };
 
-/**
- * Clear all records of the user
- */
+// 清除玩家记录
 var clearRecords = function (service, uid) {
-  delete service.channelMap[uid];
+    delete service.channelMap[uid];
 
-  var record = service.uidMap[uid];
-  if (!record) {
-    return;
-  }
+    var record = service.uidMap[uid];
+    if (!record) {
+        return;
+    }
 
-  delete service.uidMap[uid];
-  delete service.nameMap[record.name];
+    delete service.uidMap[uid];
+    delete service.nameMap[record.name];
 };
 
-/**
- * Get the connector server id assosiated with the uid
- */
+// 根据uid获取connector服务器的id
 var getSidByUid = function (uid, app) {
-  var connector = dispatcher.dispatch(uid, app.getServersByType('connector'));
-  if (connector) {
-    return connector.id;
-  }
-  return null;
+    var connector = dispatcher.dispatch(uid, app.getServersByType('connector'));
+    if (connector) {
+        return connector.id;
+    }
+    return null;
 };

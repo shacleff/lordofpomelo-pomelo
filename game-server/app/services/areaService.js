@@ -14,30 +14,25 @@ var exp = module.exports;
 exp.init = function () {
     var areas = dataApi.area.all();
 
-    //Init areas
+    // 初始化地图
     for (var key in areas) {
-        //init map
         var area = areas[key];
-
         area.weightMap = false;
         maps[area.id] = new Map(area);
     }
 };
 
-exp.getBornPlace = function (sceneId) { // 得到出生地
+// 得到出生地
+exp.getBornPlace = function (sceneId) {
     return maps[sceneId].getBornPlace();
 };
 
-exp.getBornPoint = function (sceneId) { // 得到出生点
+// 得到出生点
+exp.getBornPoint = function (sceneId) {
     return maps[sceneId].getBornPoint();
 };
 
-/**
- * Change area, will transfer a player from one area to another
- * @param args {Object} The args for transfer area, the content is {playerId, areaId, target, frontendId}
- * @param cb {funciton} Call back funciton
- * @api public
- */
+// 更改地图：玩家从一个区域传送到另外一个区域
 exp.changeArea = function (args, session, cb) { // 玩家从地图一个地方传送到另外一个地方
     var app = pomelo.app;
     var area = session.area;
@@ -57,7 +52,7 @@ exp.changeArea = function (args, session, cb) { // 玩家从地图一个地方�
         player.instanceId = 0;
         player.x = pos.x;
         player.y = pos.y;
-        utils.myPrint("1 ~ player.teamId = ", player.teamId);
+
         userDao.updatePlayer(player, function (err, success) {
             if (err || !success) {
                 err = err || 'update player failed!';
@@ -74,7 +69,6 @@ exp.changeArea = function (args, session, cb) { // 玩家从地图一个地方�
                         logger.error('Change area for session service failed! error is : %j', err.stack);
                     }
                     utils.invokeCallback(cb, null);
-                    utils.myPrint("2 ~ player.teamId = ", player.teamId);
                 });
             }
         });
@@ -89,11 +83,9 @@ exp.changeArea = function (args, session, cb) { // 玩家从地图一个地方�
                         params.id = player.teamId;
                     }
 
-                    utils.myPrint('params.id, player.teamId = ', params.id, player.teamId);
-                    utils.myPrint('playerId = ', player.id);
                     player.isInTeamInstance = true;
 
-                    //Get target instance
+                    // 虎丘目标实例
                     app.rpc.manager.instanceRemote.create(session, params, function (err, result) {
                         if (err) {
                             logger.error('get Instance error!');
@@ -106,7 +98,6 @@ exp.changeArea = function (args, session, cb) { // 玩家从地图一个地方�
                             session.set('isInTeamInstance', player.isInTeamInstance);
                             session.pushAll();
                             player.instanceId = result.instanceId;
-                            utils.myPrint('player.instanceId = ', player.instanceId);
 
                             if (player.isCaptain && player.teamId && targetInfo.type === AreaType.TEAM_INSTANCE) {
                                 utils.myPrint('DragMember2gameCopy is running ...');
