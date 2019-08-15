@@ -133,14 +133,7 @@ Handler.prototype.disbandTeam = function (msg, session, next) {
     next();
 };
 
-/**
- * Notify: Captain invite a player to join the team, and push invitation to the invitee
- *
- * @param {Object} msg
- * @param {Object} session
- * @param {Function} next
- * @api public
- */
+// 队长邀请成员加入战队,把 邀请 发给被邀请者
 Handler.prototype.inviteJoinTeam = function (msg, session, next) {
     var area = session.area;
     var captainId = session.get('playerId');
@@ -159,7 +152,7 @@ Handler.prototype.inviteJoinTeam = function (msg, session, next) {
         return;
     }
 
-    // send invitation to the invitee
+    // 发送邀请给被邀请者
     var args = {captainId: captainId, teamId: msg.teamId};
     this.app.rpc.manager.teamRemote.inviteJoinTeam(session, args, function (err, ret) {
         var result = ret.result;
@@ -173,14 +166,7 @@ Handler.prototype.inviteJoinTeam = function (msg, session, next) {
     next();
 };
 
-/**
- * Request: invitee reply to join the team's captain, response the result, and push msg to the team members
- *
- * @param {Object} msg
- * @param {Object} session
- * @param {Function} next
- * @api public
- */
+// 被邀请者回应邀请者结果,推送信息给队里每个人
 Handler.prototype.inviteJoinTeamReply = function (msg, session, next) {
     var area = session.area;
     var inviteeId = session.get('playerId');
@@ -250,14 +236,7 @@ Handler.prototype.inviteJoinTeamReply = function (msg, session, next) {
     next();
 };
 
-/**
- * Notify: applicant apply to join the team, and push the application to the captain
- *
- * @param {Object} msg
- * @param {Object} session
- * @param {Function} next
- * @api public
- */
+// 申请人加入队伍, 推送给队长通知
 Handler.prototype.applyJoinTeam = function (msg, session, next) {
     utils.myPrint('ApplyJoinTeam ~ msg = ', JSON.stringify(msg));
     var area = session.area;
@@ -287,11 +266,11 @@ Handler.prototype.applyJoinTeam = function (msg, session, next) {
         next();
         return;
     }
-    // send the application to the captain
+
+    // 发送通知给队长
     var args = {applicantId: applicantId, teamId: msg.teamId};
     this.app.rpc.manager.teamRemote.applyJoinTeam(session, args, function (err, ret) {
         var result = ret.result;
-        utils.myPrint("result = ", result);
         if (result === consts.TEAM.OK) {
             var applicantInfo = applicantObj.toJSON4Team();
             messageService.pushMessageToPlayer({uid: captainObj.userId, sid: captainObj.serverId},
@@ -301,14 +280,7 @@ Handler.prototype.applyJoinTeam = function (msg, session, next) {
     next();
 };
 
-/**
- * Notify: captain reply the application, and push msg to the team members(accept) or only the applicant(reject)
- *
- * @param {Object} msg
- * @param {Object} session
- * @param {Function} next
- * @api public
- */
+// 队长回复应用,推送信息给队内成员, 或者拒绝的应用
 Handler.prototype.applyJoinTeamReply = function (msg, session, next) {
     var area = session.area;
     var playerId = session.get('playerId');
@@ -348,8 +320,8 @@ Handler.prototype.applyJoinTeamReply = function (msg, session, next) {
             serverId: applicantObj.serverId, backendServerId: backendServerId,
             playerInfo: applicantInfo
         };
+
         this.app.rpc.manager.teamRemote.acceptApplicantJoinTeam(session, args, function (err, ret) {
-            utils.myPrint('ApplyJoinTeamReply ~ ret = ', JSON.stringify(ret));
             result = ret.result;
             if (result === consts.TEAM.JOIN_TEAM_RET_CODE.OK) {
                 if (!applicantObj.joinTeam(msg.teamId)) {
@@ -369,28 +341,20 @@ Handler.prototype.applyJoinTeamReply = function (msg, session, next) {
                         },
                         {x: applicantObj.x, y: applicantObj.y}, ignoreList);
                 }
-                utils.myPrint('applicantObj teamId = ', applicantObj.teamId);
             } else {
                 messageService.pushMessageToPlayer({uid: applicantObj.userId, sid: applicantObj.serverId},
                     'onApplyJoinTeamReply', {reply: ret.result});
             }
         });
     } else {
-        // push tmpMsg to the applicant that the captain rejected
+        // 推送队长拒绝的信息
         messageService.pushMessageToPlayer({uid: applicantObj.userId, sid: applicantObj.serverId},
             'onApplyJoinTeamReply', {reply: consts.TEAM.JOIN_TEAM_REPLY.REJECT});
     }
     next();
 };
 
-/**
- * Captain kicks a team member, and push info to the kicked member and other members
- *
- * @param {Object} msg
- * @param {Object} session
- * @param {Function} next
- * @api public
- */
+// 队长踢掉一个成员,推送信息给被踢掉的成员 或 其它成员
 Handler.prototype.kickOut = function (msg, session, next) {
     var area = session.area;
     var captainId = session.get('playerId');
@@ -427,14 +391,7 @@ Handler.prototype.kickOut = function (msg, session, next) {
     next();
 };
 
-/**
- * member leave the team voluntarily, and push info to other members
- *
- * @param {Object} msg
- * @param {Object} session
- * @param {Function} next
- * @api public
- */
+// 成员自愿离开队伍,推送信息给其它成员
 Handler.prototype.leaveTeam = function (msg, session, next) {
     var area = session.area;
     var playerId = session.get('playerId');
@@ -446,19 +403,12 @@ Handler.prototype.leaveTeam = function (msg, session, next) {
         return;
     }
 
-    utils.myPrint('playerId, IsInTeamInstance = ', playerId, player.isInTeamInstance);
     if (player.isInTeamInstance) {
         next();
         return;
     }
 
     var result = consts.TEAM.FAILED;
-
-    utils.myPrint("player.teamId = ", player.teamId);
-    utils.myPrint("typeof player.teamId = ", typeof player.teamId);
-
-    utils.myPrint("msg.teamId = ", msg.teamId);
-    utils.myPrint("typeof msg.teamId = ", typeof msg.teamId);
 
     if (player.teamId <= consts.TEAM.TEAM_ID_NONE || player.teamId !== msg.teamId) {
         logger.warn('The request(leaveTeam) is illegal, the teamId is wrong: msg = %j.', msg);
@@ -491,8 +441,6 @@ Handler.prototype.leaveTeam = function (msg, session, next) {
                     },
                     {x: player.x, y: player.y}, ignoreList);
             }
-
-            utils.myPrint("teamId = ", player.teamId);
         });
 
     next();
